@@ -1,0 +1,29 @@
+name: Deploy master
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
+    - name: Generate deployment package
+      run: zip -r deploy.zip . -x '*.git*'
+
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v20
+      with:
+        aws_access_key: AKIA6DEVZVHFINMHRSG3
+        aws_secret_key: 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
+        application_name: cashwarden
+        environment_name: Cashwarden
+        version_label: 1.0.5
+        region: eu-west-3
+        deployment_package: deploy.zip
+
+
