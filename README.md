@@ -1,5 +1,7 @@
 # Curlied-BackEnd
 
+Le nouveau projet 2.0 de curlied
+
 Afin de lancer l'application vous pouvez faire : 
 
 ```
