@@ -1,4 +1,4 @@
-const Joi = require('Joi');
+const Joi = require('joi');
 
 const register = Joi.object().keys({
   username: Joi.string()
