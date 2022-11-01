@@ -23,8 +23,8 @@ const validate = (schema) => (req, res, next) => {
       .join(', ');
     const statusCode =
       res.statusCode !== httpStatus.OK ?
-      res.statusCode :
-      httpStatus.BAD_REQUEST;
+        res.statusCode :
+        httpStatus.BAD_REQUEST;
     res.status(statusCode);
     if (process.env.NODE_ENV == 'prod') {
       res.json({

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const catchAsync = require('../utils/catchAsync');
 const eventService = require('../services/event.service');
 const userService = require('../services/user.service');
@@ -81,17 +80,17 @@ const getDetailsEvent = catchAsync(async (req, res, next) => {
   try {
     const event = await eventService.findOneById(req.params._id);
     const category = await categoryService.FindOneById(event.category);
-    const usersIdArray = event.users.map(w => w.user_id);  
+    const usersIdArray = event.users.map(w => w.user_id);
 
     let eventObject = event?.toObject();
 
-    let filter ;
+    let filter;
     if (req.CurrentUserIsAdmin == true) {
       eventObject.CurrentUserIsAdmin = true;
-      filter= 'username telephone -_id'
+      filter = 'username telephone -_id';
     } else {
       eventObject.CurrentUserHasParticipant = req.CurrentUserHasParticipant;
-      filter='username -_id'
+      filter = 'username -_id';
     }
 
     const userParticipate = await userService.findManyById(usersIdArray, filter);

@@ -16,7 +16,7 @@ const categorySchema = new mongoose.Schema({
     type: types.String,
     required: true
   },
-  url_icon:{
+  url_icon: {
     type: types.String,
     required: true
   },

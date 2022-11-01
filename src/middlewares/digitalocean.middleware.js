@@ -37,7 +37,7 @@ const get_image_profil = async (req, namefile) => {
  * @returns
  */
 const push_image = (sub_folder) => (req, res, next) => {
-  
+
   if (!req || !req.files) {
     return next();
   }
@@ -45,7 +45,7 @@ const push_image = (sub_folder) => (req, res, next) => {
   let arrayFile = Object.values(req.files);
   let arrayUrl = [];
   // eslint-disable-next-line no-unused-vars
-  let f ;
+  let f;
 
   arrayFile.forEach((file) => {
     f = file;
