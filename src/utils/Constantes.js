@@ -8,10 +8,9 @@ const uuid = () => {
 
 module.exports = Object.freeze({
   MESSAGE: {
-    REGISTER_SUCCES:
-      'Votre compte à correctement été enregistré, veuillez confirmer votre email',
-    REGISTER_FAILED:
-      'Une erreur est survenue pendant la procédure d\'inscription',
+    BODY_IS_REQUIRED: 'The body in request is required',
+    REGISTER_SUCCES: 'Votre compte à correctement été enregistré, veuillez confirmer votre email',
+    REGISTER_FAILED: 'Une erreur est survenue pendant la procédure d\'inscription',
     EMAIL_ALSO_EXIST: 'L\'adresse email est déjà présente',
     IMAGE_USER_NOT_UPLOAD: 'L\'image de l\'utilisateur n\'as pas pû être uploadé',
     CONFIRMATION_MAIL_SUCCESS: 'Votre compte a été créée et validé avec succès',
@@ -29,7 +28,6 @@ module.exports = Object.freeze({
     CANCEL_EVENT_NOT_AUTHORIZE: 'Vous n\'avez pas le droit de supprimer cet évènement !',
     CANCEL_EVENT_OK: 'L\'évènement à correctement été annulé',
     NO_PLACE_ON_EVENT: 'Il n\'y a plus de place pour participer à cet évènement'
-
   },
   EMAIL_REPLACE: {
     PSEUDO: '%%pseudo%%',
