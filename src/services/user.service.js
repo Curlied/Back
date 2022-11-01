@@ -59,15 +59,15 @@ const login = async (req) => {
 
   });
 
-  
+
 
   if (!user) {
     return 'Invalid Credentiel';
 
   }
-  const isCorrectPwd =await bcrypt.compare(req.body.password,user.password);
-  if(isCorrectPwd == false){
-    
+  const isCorrectPwd = await bcrypt.compare(req.body.password, user.password);
+  if (isCorrectPwd == false) {
+
     return 'email or password incorrect';
   }
 

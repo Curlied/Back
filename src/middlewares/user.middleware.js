@@ -65,7 +65,7 @@ const isConnected = async (req, res, next) => {
 
 const isAdmin = async (req, res, next) => {
   const roles = req.user.roles;
-  if(roles.includes('619f8c5e274ed82841f49d6e')){
+  if (roles.includes('619f8c5e274ed82841f49d6e')) {
     return next();
   }
   const error = new Error('Vous n\'êtes pas autorisé');

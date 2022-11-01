@@ -37,28 +37,28 @@ const register = catchAsync(async (req, res, next) => {
 
 const login = catchAsync(async (req, res, next) => {
 
-  
+
   try {
     let email = req.body.email;
     let password = req.body.password;
-    if(email  == null ||email == ''){
+    if (email == null || email == '') {
       var erroremailNull = new Error('L\'adresse mail ou le mot de passe est vide');
       return errorF(erroremailNull.message, erroremailNull, httpStatus.NOT_ACCEPTABLE, res, next);
     }
-    if(password  == null || password == ''){
+    if (password == null || password == '') {
       var errorpwdNull = new Error('L\'adresse mail ou le mot de passe est vide');
       return errorF(errorpwdNull.message, errorpwdNull, httpStatus.NOT_ACCEPTABLE, res, next);
     }
-    
+
     const data = await userService.login(req);
 
-    if(data == 'email or password incorrect'){
+    if (data == 'email or password incorrect') {
       var errorPass = new Error('L\'adresse mail ou le mot de passe est invalide');
       return errorF(errorPass.message, errorPass, httpStatus.BAD_REQUEST, res, next);
 
     }
-    const token = data.token; 
-    if (token == 'Invalid Credentiel'  ) {
+    const token = data.token;
+    if (token == 'Invalid Credentiel') {
       var error = new Error('L\'adresse mail ou le mot de passe est invalide');
       errorF(error.message, error, httpStatus.BAD_REQUEST, res, next);
     } else {

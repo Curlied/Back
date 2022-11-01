@@ -39,7 +39,7 @@ const eventExistAndNotDone = async (req, res, next) => {
 
     next();
   }
-  catch(error){
+  catch (error) {
     errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
   }
 };

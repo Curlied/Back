@@ -21,7 +21,7 @@ const {
 } = require('../middlewares/event.middleware');
 const router = express.Router();
 
-router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'), ], eventController.create);
+router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'),], eventController.create);
 // router.put('/:_id', validate(eventValidation.update), eventController.update);
 router.get('/', filterF(filterAllowed), eventController.getAll);
 router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);

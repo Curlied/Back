@@ -58,11 +58,11 @@ const eventModel = new mongoose.Schema({
   },
   code: {
     type: types.String,
-    required : true
+    required: true
   },
   department: {
     type: types.String,
-    required : true
+    required: true
   },
   url_image: [String]
 });

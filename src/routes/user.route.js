@@ -13,7 +13,7 @@ const {
   isConnected
 } = require('../middlewares/user.middleware');
 
-router.post('/register', [validate(authValidation.register), isUniqueMail, push_image('users_pictures'), ], authController.register);
+router.post('/register', [validate(authValidation.register), isUniqueMail, push_image('users_pictures'),], authController.register);
 router.post('/login', [validate(authValidation.login), isValidate], authController.login);
 router.get('/confirm', authController.confirm);
 router.get('/disconnect', [isConnected], authController.disconnect);
