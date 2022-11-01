@@ -13,8 +13,11 @@ const {
   isConnected
 } = require('../middlewares/user.middleware');
 
-router.post('/register', [validate(authValidation.register), isUniqueMail, push_image('users_pictures'),], authController.register);
-router.post('/login', [validate(authValidation.login), isValidate], authController.login);
+// import common middlewares
+const { check_body_exist } = require('../middlewares/common');
+
+router.post('/register', [check_body_exist, validate(authValidation.register), isUniqueMail, push_image('users_pictures'),], authController.register);
+router.post('/login', [check_body_exist, validate(authValidation.login), isValidate], authController.login);
 router.get('/confirm', authController.confirm);
 router.get('/disconnect', [isConnected], authController.disconnect);
 router.get('/space-user/my-profil', [isConnected], userController.myProfilDetailsUsers);
