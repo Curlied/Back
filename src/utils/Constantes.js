@@ -18,7 +18,7 @@ module.exports = Object.freeze({
     CONFIRMATION_MAIL_ERROR: 'L\'actualisation de l\'adresse n\'a pas pû être réalisé',
     CONFIRMATION_EVENT_ADD: 'L\'évènement à bien été enregistrer et est en attente de validation',
     CONFIRMATION_NOT_MADE: 'Vous n\'avez pas encore validé votre email',
-    USER_NOT_EXIST: 'Il n\'existe pas de compte associé à cette utilisateur',
+    USER_NOT_EXIST: 'There is no account associated with this user',
     DEMAND_PARTICIPATION_IS_OK: 'Votre demande de participation à l\'évènement à bien été soumis à l\'organisateur',
     DEMAND_PARTICIPATION_IS_NOK: 'Une erreur est survenue pendant votre demande de participation à l\'évènement',
     ERROR_USER_EVEN_PARTICIPATION_ON_EVENT: 'Vous participez déjà a cette évènement',

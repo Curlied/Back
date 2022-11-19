@@ -1,9 +1,8 @@
-const express = require('express');
-const validate = require('../middlewares/validate');
+const router = require('express').Router();
+const { body_validator } = require('../middlewares/validate');
 const authController = require('../controllers/auth.controller');
 const userController = require('../controllers/user.controller');
 const authValidation = require('../validations/auth.validation');
-const router = express.Router();
 const {
   push_image
 } = require('../middlewares/digitalocean.middleware');
@@ -16,8 +15,8 @@ const {
 // import common middlewares
 const { check_body_exist } = require('../middlewares/common');
 
-router.post('/register', [check_body_exist, validate(authValidation.register), isUniqueMail, push_image('users_pictures'),], authController.register);
-router.post('/login', [check_body_exist, validate(authValidation.login), isValidate], authController.login);
+router.post('/register', check_body_exist, body_validator(authValidation.register), isUniqueMail, push_image('users_pictures'), authController.register);
+router.post('/login', check_body_exist, body_validator(authValidation.login), isValidate, authController.login);
 router.get('/confirm', authController.confirm);
 router.get('/disconnect', [isConnected], authController.disconnect);
 router.get('/space-user/my-profil', [isConnected], userController.myProfilDetailsUsers);

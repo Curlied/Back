@@ -3,7 +3,7 @@ const { BODY_IS_REQUIRED } = require('../utils/Constantes').MESSAGE;
 
 const check_body_exist = (request, response, next) => {
   const { body } = request;
-  if (!body) return response.status(httpStatus.BAD_REQUEST).json({
+  if (!body | !Object.keys(body).length) return response.status(httpStatus.BAD_REQUEST).json({
     message: BODY_IS_REQUIRED
   });
   next();
