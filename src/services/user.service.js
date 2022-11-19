@@ -4,8 +4,6 @@ const config = require('../config');
 const jwt = require('jsonwebtoken');
 const SearchDefaultValue = 'username email';
 
-
-
 const create = async (userBody) => {
   userBody.password = bcrypt.hashSync(userBody.password, 10);
   return User.create(userBody);
@@ -48,28 +46,12 @@ const compareAsync = (param1, param2) => {
   });
 };
 
-const login = async (req) => {
-  const {
-    email,
-    password
-  } = req.body;
+const login = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user) return false;
 
-  const user = await User.findOne({
-    email: email
-
-  });
-
-
-
-  if (!user) {
-    return 'Invalid Credentiel';
-
-  }
-  const isCorrectPwd = await bcrypt.compare(req.body.password, user.password);
-  if (isCorrectPwd == false) {
-
-    return 'email or password incorrect';
-  }
+  const isCorrectPwd = await bcrypt.compare(password, user.password);
+  if (!isCorrectPwd) return false;
 
   const accessToken = await jwt.sign({
     email: user.email,
@@ -78,11 +60,8 @@ const login = async (req) => {
   }, config.token.secret, { expiresIn: config.token.expire });
 
   const test = await compareAsync(password, user.password);
-  if (test) {
-    return { 'token': accessToken, 'username': user.username };
-  } else {
-    return 'Invalid Credentiel';
-  }
+  if (!test) return false;
+  return { token: accessToken, username: user.username };
 };
 
 const getAge = (birth_date) => {
@@ -96,7 +75,6 @@ const getAge = (birth_date) => {
     ? year_diff
     : year_diff - 1;
 };
-
 
 module.exports = {
   create,

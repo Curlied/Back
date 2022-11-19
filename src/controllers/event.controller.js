@@ -1,4 +1,3 @@
-const catchAsync = require('../utils/catchAsync');
 const eventService = require('../services/event.service');
 const userService = require('../services/user.service');
 const categoryService = require('../services/category.service');
@@ -7,31 +6,31 @@ const constants = require('../utils/Constantes');
 const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 
-const create = catchAsync(async (req, res, next) => {
+const create = async (request, response) => {
   try {
-    await eventService.create(req);
-    successF(constants.MESSAGE.CONFIRMATION_EVENT_ADD, true, 200, res, next);
+    await eventService.create(request);
+    successF(constants.MESSAGE.CONFIRMATION_EVENT_ADD, true, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const validate = catchAsync(async (req, res, next) => {
+const validate = async (request, response) => {
   try {
-    await eventService.validate(req);
-    successF('Event validé', true, 200, res, next);
+    await eventService.validate(request);
+    successF('Event validé', true, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const getAll = catchAsync(async (req, res, next) => {
+const getAll = async (request, response) => {
   try {
-    req.filter.is_validate = true;
-    req.filter.date_time = {
+    request.filter.is_validate = true;
+    request.filter.date_time = {
       $gte: Date.now()
     };
-    const result = await eventService.getAll(req);
+    const result = await eventService.getAll(request);
 
     let arrayEvent = result;
     // let arrayEvent = result.docs;
@@ -51,14 +50,14 @@ const getAll = catchAsync(async (req, res, next) => {
       delete arrayEvent[i]._doc.creator;
     }
 
-    successF('OK', result, 200, res, next);
+    successF('OK', result, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const getAllFiltered = catchAsync(async (req, res, next) => {
-  const events = await eventService.getAllFiltered(req);
+const getAllFiltered = async (request, response) => {
+  const events = await eventService.getAllFiltered(request);
   for (let i = 0; i < events.length; i++) {
     const category = await categoryService.FindOneById(events[i].category);
     events[i]._doc.categoryComplet = category;
@@ -73,23 +72,23 @@ const getAllFiltered = catchAsync(async (req, res, next) => {
     delete events[i]._doc.category;
     delete events[i]._doc.creator;
   }
-  successF('OK', events, 200, res, next);
-});
+  successF('OK', events, 200, response);
+};
 
-const getDetailsEvent = catchAsync(async (req, res, next) => {
+const getDetailsEvent = async (request, response) => {
   try {
-    const event = await eventService.findOneById(req.params._id);
+    const event = await eventService.findOneById(request.params._id);
     const category = await categoryService.FindOneById(event.category);
     const usersIdArray = event.users.map(w => w.user_id);
 
     let eventObject = event?.toObject();
 
     let filter;
-    if (req.CurrentUserIsAdmin == true) {
+    if (request.CurrentUserIsAdmin == true) {
       eventObject.CurrentUserIsAdmin = true;
       filter = 'username telephone -_id';
     } else {
-      eventObject.CurrentUserHasParticipant = req.CurrentUserHasParticipant;
+      eventObject.CurrentUserHasParticipant = request.CurrentUserHasParticipant;
       filter = 'username -_id';
     }
 
@@ -101,46 +100,46 @@ const getDetailsEvent = catchAsync(async (req, res, next) => {
     eventObject.creator = userCreator?.toObject();
 
 
-    successF('OK', eventObject, 200, res, next);
+    successF('OK', eventObject, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const submitParticipation = catchAsync(async (req, res, next) => {
+const submitParticipation = async (request, response) => {
   try {
-    await eventService.submitParticipant(req);
-    successF(constants.MESSAGE.DEMAND_PARTICIPATION_IS_OK, true, 200, res, next);
+    await eventService.submitParticipant(request);
+    successF(constants.MESSAGE.DEMAND_PARTICIPATION_IS_OK, true, 200, response);
   } catch (error) {
-    errorF(constants.MESSAGE.DEMAND_PARTICIPATION_IS_NOK, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(constants.MESSAGE.DEMAND_PARTICIPATION_IS_NOK, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const cancelParticipation = catchAsync(async (req, res, next) => {
+const cancelParticipation = async (request, response) => {
   try {
-    await eventService.cancelParticipant(req);
-    successF(constants.MESSAGE.CANCEL_PARTICIPATION_ON_EVENT_OK, true, 200, res, next);
+    await eventService.cancelParticipant(request);
+    successF(constants.MESSAGE.CANCEL_PARTICIPATION_ON_EVENT_OK, true, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const cancelEvent = catchAsync(async (req, res, next) => {
+const cancelEvent = async (request, response) => {
   try {
-    const event = await eventService.cancelEvent(req.params._id);
+    const event = await eventService.cancelEvent(request.params._id);
     if (event.date_time.getFullYear() != 0) {
       var error = new Error('Une erreur est survenue pendant l\'annulation de l\'évènement');
-      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
     }
-    successF(constants.MESSAGE.CANCEL_EVENT_OK, true, 200, res, next);
+    successF(constants.MESSAGE.CANCEL_EVENT_OK, true, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const search = catchAsync(async (req, res, next) => {
+const search = async (request, response) => {
   try {
-    const arrayEvent = await eventService.searchEvents(req);
+    const arrayEvent = await eventService.searchEvents(request);
 
     for (let i = 0; i < arrayEvent.length; i++) {
       const category = await categoryService.FindOneById(arrayEvent[i].category);
@@ -152,13 +151,14 @@ const search = catchAsync(async (req, res, next) => {
 
     if (arrayEvent.length == 0) {
       var error = new Error('Aucun évènement n\'à été trouvé avec cet recherche');
-      return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+      return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
     }
-    successF('ok', arrayEvent, 200, res, next);
+    successF('ok', arrayEvent, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
+
 module.exports = {
   create,
   validate,

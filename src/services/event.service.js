@@ -23,17 +23,18 @@ const validate = async (req) => {
   return event;
 };
 
+// eslint-disable-next-line no-unused-vars
 const getAllPagination = async (req) => {
   return await pagination(Event, req);
 };
 
-const getAll = async (req) => {
+const getAll = async () => {
   return await Event.find({ is_validate: true, date_time: { $gte: Date.now() } });
 };
 
 const getAllFiltered = async (req) => {
   const filter = req.filter;
-  return await Event.find(req.filter);
+  return await Event.find(filter);
 };
 
 const findOneById = async (_id) => {

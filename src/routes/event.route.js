@@ -1,5 +1,5 @@
-const express = require('express');
-const validate = require('../middlewares/validate');
+const router = require('express').Router();
+const { body_validator } = require('../middlewares/validate');
 const eventController = require('../controllers/event.controller');
 const eventValidation = require('../validations/event.validation');
 const {
@@ -19,9 +19,8 @@ const {
   userCanCancelEvent,
   userCanCancelParticipationOnEvent
 } = require('../middlewares/event.middleware');
-const router = express.Router();
 
-router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'),], eventController.create);
+router.post('/', [isConnected, body_validator(eventValidation.create), push_image('event_pictures'),], eventController.create);
 // router.put('/:_id', validate(eventValidation.update), eventController.update);
 router.get('/', filterF(filterAllowed), eventController.getAll);
 router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
@@ -33,7 +32,7 @@ router.put('/cancel-participation', [isConnected, userCanCancelParticipationOnEv
 router.delete('/cancel/:_id', [isConnected, userCanCancelEvent], eventController.cancelEvent);
 
 router.get('/:_id/validate', [isConnected, isAdmin], eventController.validate);
-router.post('/search', validate(eventValidation.search), eventController.search);
+router.post('/search', body_validator(eventValidation.search), eventController.search);
 
 
 module.exports = router;

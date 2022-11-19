@@ -1,4 +1,3 @@
-const catchAsync = require('../utils/catchAsync');
 const userService = require('../services/user.service');
 const eventService = require('../services/event.service');
 const categoryService = require('../services/category.service');
@@ -9,22 +8,22 @@ const successF = require('../utils/success');
 const {
   Role
 } = require('../models');
-const findById = catchAsync(async (req, res, next) => {
+const findById = async (request, response) => {
   try {
-    const user = await userService.findOne(req.params);
+    const user = await userService.findOne(request.params);
 
-    successF(constants.MESSAGE.REGISTER_SUCCES, user, 200, res, next);
+    successF(constants.MESSAGE.REGISTER_SUCCES, user, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const myProfilDetailsUsers = catchAsync(async (req, res, next) => {
+const myProfilDetailsUsers = async (request, response) => {
   try {
-    const user = await userService.findOne(req.user.userId, 'username birth_date url_image');
+    const user = await userService.findOne(request.user.userId, 'username birth_date url_image');
     if (!user) {
       const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
-      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
     }
     /*==  PERSONAL PROFIL: ==*/
     const age = await userService.getAge(user.birth_date);
@@ -53,19 +52,19 @@ const myProfilDetailsUsers = catchAsync(async (req, res, next) => {
       'eventInProgress': allEventCreateInProgress
     };
 
-    successF('OK', profilInfos, 200, res, next);
+    successF('OK', profilInfos, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const personalInformationsDetailsUser = catchAsync(async (req, res, next) => {
+const personalInformationsDetailsUser = async (request, response) => {
   try {
-    const user = await userService.findOne(req.user.userId, 'username description email birth_date telephone url_image');
+    const user = await userService.findOne(request.user.userId, 'username description email birth_date telephone url_image');
 
     if (!user) {
       const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
-      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
     }
 
     /*==  PERSONAL PROFIL: ==*/
@@ -78,19 +77,19 @@ const personalInformationsDetailsUser = catchAsync(async (req, res, next) => {
       'telephone': user.telephone,
       'url_image': user.url_image
     };
-    successF('ok', personalInformations, 200, res, next);
+    successF('ok', personalInformations, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const getAllEventsFromSpaceUser = catchAsync(async (req, res, next) => {
+const getAllEventsFromSpaceUser = async (request, response) => {
   try {
 
 
     /*==  EVENT USERS: ==*/
     // historique event create
-    const allEventsCreate = await eventService.findAllForSpaceUserByCreator(req.user.userId);
+    const allEventsCreate = await eventService.findAllForSpaceUserByCreator(request.user.userId);
     const allEventCreateInProgress = await allEventsCreate.filter(x => x.date_time > Date.now());
 
     // get category
@@ -130,7 +129,7 @@ const getAllEventsFromSpaceUser = catchAsync(async (req, res, next) => {
     }
 
     //Evénements Participé
-    const allEventRequestParticipate = await eventService.findAllEventsUserParticpateIn(req);
+    const allEventRequestParticipate = await eventService.findAllEventsUserParticpateIn(request);
     const allEventParticipateInProgress = allEventRequestParticipate.filter(x => x.date_time > Date.now());
 
     for (let i = 0; i < allEventParticipateInProgress.length; i++) {
@@ -142,7 +141,7 @@ const getAllEventsFromSpaceUser = catchAsync(async (req, res, next) => {
         'url_icon': categorytName.url_icon,
       };
 
-      const currentUser = allEventParticipateInProgress[i].users.find(usr => usr.user_id == req.user.userId);
+      const currentUser = allEventParticipateInProgress[i].users.find(usr => usr.user_id == request.user.userId);
       allEventParticipateInProgress[i]._doc.statusCurrentUser = currentUser._doc.status;
       delete allEventParticipateInProgress[i]._doc.users;
     }
@@ -153,22 +152,22 @@ const getAllEventsFromSpaceUser = catchAsync(async (req, res, next) => {
       eventsParticipate: allEventParticipateInProgress,
     };
 
-    successF(constants.MESSAGE.REGISTER_SUCCES, allEvents, 200, res, next);
+    successF(constants.MESSAGE.REGISTER_SUCCES, allEvents, 200, response);
   } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-});
+};
 
-const getRoles = catchAsync(async (req, res, next) => {
-  let roles = req.user.roles;
+const getRoles = async (request, response) => {
+  let roles = request.user.roles;
   roles = await Promise.all(roles.map(async (roleId) => {
     const role = await Role.findOne({
       _id: roleId
     });
     return role.name;
   }));
-  successF('Voici mes roles', roles, 200, res, next);
-});
+  successF('Voici mes roles', roles, 200, response);
+};
 
 module.exports = {
   findById,
