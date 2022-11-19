@@ -5,168 +5,176 @@ const constants = require('../utils/Constantes');
 const httpStatus = require('http-status');
 const errorF = require('../utils/error');
 const successF = require('../utils/success');
-const {
-  Role
-} = require('../models');
-const findById = async (request, response) => {
-  try {
-    const user = await userService.findOne(request.params);
+const { Role } = require('../models');
+const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 
-    successF(constants.MESSAGE.REGISTER_SUCCES, user, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-  }
+const findById = async (request, response) => {
+  const { params } = request;
+  const { user_id } = params;
+  const user = await userService.findOne(user_id);
+  return successF(
+    constants.MESSAGE.REGISTER_SUCCES,
+    user,
+    httpStatus.OK,
+    response
+  );
 };
 
 const myProfilDetailsUsers = async (request, response) => {
-  try {
-    const user = await userService.findOne(request.user.userId, 'username birth_date url_image');
-    if (!user) {
-      const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
-      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-    }
-    /*==  PERSONAL PROFIL: ==*/
-    const age = await userService.getAge(user.birth_date);
-
-
-    /*==  EVENT USERS: ==*/
-    // historique event create
-    const allEventsCreate = await eventService.findAllByCreatorForMyProfil(user._id);
-    const allEventCreateInProgress = await allEventsCreate.filter(x => x.date_time > Date.now());
-
-    for (let i = 0; i < allEventCreateInProgress.length; i++) {
-      const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
-      delete allEventCreateInProgress[i]._doc.category;
-      allEventCreateInProgress[i]._doc.categoryInfo = {
-        'name': categorytName.name,
-        'url_image': categorytName.url_image,
-        'url_icon': categorytName.url_icon,
-      };
-    }
-
-    let profilInfos = {
-      'username': user.username,
-      'age': age,
-      'url_image': user.url_image,
-      'description': 'Pionnièr(e) passionné(e) du Web. Praticien amateur de la culture pop. Amoureux d\'Internet. Accro au café. Spécialiste de la musique. Geek au bacon.',
-      'eventInProgress': allEventCreateInProgress
-    };
-
-    successF('OK', profilInfos, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
+  const user = await userService.findOne(user_id, 'username birth_date url_image');
+  if (!user) {
+    const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
+  /*==  PERSONAL PROFIL: ==*/
+  const age = await userService.getAge(user.birth_date);
+
+  /*==  EVENT USERS: ==*/
+  // historique event create
+  const allEventsCreate = await eventService.findAllByCreatorForMyProfil(user_id);
+  const allEventCreateInProgress = allEventsCreate.filter(x => x.date_time > Date.now());
+
+  for (let i = 0; i < allEventCreateInProgress.length; i++) {
+    const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
+    delete allEventCreateInProgress[i]._doc.category;
+    allEventCreateInProgress[i]._doc.categoryInfo = {
+      'name': categorytName.name,
+      'url_image': categorytName.url_image,
+      'url_icon': categorytName.url_icon,
+    };
+  }
+
+  let profilInfos = {
+    'username': user.username,
+    'age': age,
+    'url_image': user.url_image,
+    'description': '',
+    'eventInProgress': allEventCreateInProgress
+  };
+
+  return successF(
+    'OK',
+    profilInfos,
+    httpStatus.OK,
+    response
+  );
 };
 
 const personalInformationsDetailsUser = async (request, response) => {
-  try {
-    const user = await userService.findOne(request.user.userId, 'username description email birth_date telephone url_image');
+  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
+  const searchField = 'username description email birth_date telephone url_image';
+  const user = await userService.findOne(user_id, searchField);
 
-    if (!user) {
-      const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
-      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-    }
-
-    /*==  PERSONAL PROFIL: ==*/
-
-    let personalInformations = {
-      'username': user.username,
-      'email': user.email,
-      'birthdate': user.birth_date,
-      'description': user.description,
-      'telephone': user.telephone,
-      'url_image': user.url_image
-    };
-    successF('ok', personalInformations, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+  if (!user) {
+    const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
+
+  /*==  PERSONAL PROFIL: ==*/
+  let personalInformations = {
+    'username': user.username,
+    'email': user.email,
+    'birthdate': user.birth_date,
+    'description': user.description,
+    'telephone': user.telephone,
+    'url_image': user.url_image
+  };
+  return successF(
+    'OK',
+    personalInformations,
+    httpStatus.OK,
+    response
+  );
 };
 
 const getAllEventsFromSpaceUser = async (request, response) => {
-  try {
+  /*==  EVENT USERS: ==*/
+  // historique event create
+  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
+  const allEventsCreate = await eventService.findAllForSpaceUserByCreator(user_id);
+  const allEventCreateInProgress = await allEventsCreate.filter(x => x.date_time > Date.now());
+
+  // get category
+  for (let i = 0; i < allEventCreateInProgress.length; i++) {
+    const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
+    delete allEventCreateInProgress[i]._doc.category;
+    allEventCreateInProgress[i]._doc.categoryInfo = {
+      'name': categorytName.name,
+      'url_image': categorytName.url_image,
+      'url_icon': categorytName.url_icon,
+    };
+  }
 
 
-    /*==  EVENT USERS: ==*/
-    // historique event create
-    const allEventsCreate = await eventService.findAllForSpaceUserByCreator(request.user.userId);
-    const allEventCreateInProgress = await allEventsCreate.filter(x => x.date_time > Date.now());
+  /* RECUP ALL USER ON EVENT CREATED , IN PROGRESS AND VALIDATE*/
+  for (let i = 0; i < allEventCreateInProgress.length; i++) {
+    if (allEventCreateInProgress[i].is_validate) {
 
-    // get category
-    for (let i = 0; i < allEventCreateInProgress.length; i++) {
-      const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
-      delete allEventCreateInProgress[i]._doc.category;
-      allEventCreateInProgress[i]._doc.categoryInfo = {
-        'name': categorytName.name,
-        'url_image': categorytName.url_image,
-        'url_icon': categorytName.url_icon,
-      };
-    }
+      const usersIdArray = allEventCreateInProgress[i].users.map(w => w.user_id);
+      const arrayUser = await userService.findManyUsersByUserArrayNoAsync(usersIdArray, 'username');
 
-
-    /* RECUP ALL USER ON EVENT CREATED , IN PROGRESS AND VALIDATE*/
-    for (let i = 0; i < allEventCreateInProgress.length; i++) {
-      if (allEventCreateInProgress[i].is_validate == true) {
-
-        const usersIdArray = allEventCreateInProgress[i].users.map(w => w.user_id);
-        const arrayUser = await userService.findManyUsersByUserArrayNoAsync(usersIdArray, 'username');
-
-
-        // find a similar id between UserIdOnEvent
-        // and user
-        for (let y = 0; y < arrayUser.length; y++) {
-          let usersOnEvent = await allEventCreateInProgress[i].users;
-          const userWithStatut = usersOnEvent.find(x => x.user_id.toString() == arrayUser[y].id);
-          arrayUser[y]._doc.status = userWithStatut.status;
-          delete arrayUser[y]._doc._id;
-        }
-
-        allEventCreateInProgress[i]._doc.usersComplet = arrayUser;
-        delete allEventCreateInProgress[i]._doc.users;
-      } else {
-        delete allEventCreateInProgress[i]._doc.users;
+      // find a similar id between UserIdOnEvent
+      // and user
+      for (let y = 0; y < arrayUser.length; y++) {
+        let usersOnEvent = await allEventCreateInProgress[i].users;
+        const userWithStatut = usersOnEvent.find(x => x.user_id.toString() == arrayUser[y].id);
+        arrayUser[y]._doc.status = userWithStatut.status;
+        delete arrayUser[y]._doc._id;
       }
+
+      allEventCreateInProgress[i]._doc.usersComplet = arrayUser;
+      delete allEventCreateInProgress[i]._doc.users;
+    } else {
+      delete allEventCreateInProgress[i]._doc.users;
     }
+  }
 
-    //Evénements Participé
-    const allEventRequestParticipate = await eventService.findAllEventsUserParticpateIn(request);
-    const allEventParticipateInProgress = allEventRequestParticipate.filter(x => x.date_time > Date.now());
+  //Evénements Participé
+  const allEventRequestParticipate = await eventService.findAllEventsUserParticpateIn(user_id);
+  const allEventParticipateInProgress = allEventRequestParticipate.filter(x => x.date_time > Date.now());
 
-    for (let i = 0; i < allEventParticipateInProgress.length; i++) {
-      const categorytName = await categoryService.FindOneById(allEventParticipateInProgress[i].category);
-      delete allEventParticipateInProgress[i]._doc.category;
-      allEventParticipateInProgress[i]._doc.categoryInfo = {
-        'name': categorytName.name,
-        'url_image': categorytName.url_image,
-        'url_icon': categorytName.url_icon,
-      };
-
-      const currentUser = allEventParticipateInProgress[i].users.find(usr => usr.user_id == request.user.userId);
-      allEventParticipateInProgress[i]._doc.statusCurrentUser = currentUser._doc.status;
-      delete allEventParticipateInProgress[i]._doc.users;
-    }
-
-
-    const allEvents = {
-      eventsCreate: allEventCreateInProgress,
-      eventsParticipate: allEventParticipateInProgress,
+  for (let i = 0; i < allEventParticipateInProgress.length; i++) {
+    const categorytName = await categoryService.FindOneById(allEventParticipateInProgress[i].category);
+    delete allEventParticipateInProgress[i]._doc.category;
+    allEventParticipateInProgress[i]._doc.categoryInfo = {
+      'name': categorytName.name,
+      'url_image': categorytName.url_image,
+      'url_icon': categorytName.url_icon,
     };
 
-    successF(constants.MESSAGE.REGISTER_SUCCES, allEvents, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+    const currentUser = allEventParticipateInProgress[i].users.find(usr => usr.user_id == user_id);
+    allEventParticipateInProgress[i]._doc.statusCurrentUser = currentUser._doc.status;
+    delete allEventParticipateInProgress[i]._doc.users;
   }
+
+  const allEvents = {
+    eventsCreate: allEventCreateInProgress,
+    eventsParticipate: allEventParticipateInProgress,
+  };
+
+  return successF(
+    constants.MESSAGE.REGISTER_SUCCES,
+    allEvents,
+    httpStatus.OK,
+    response
+  );
 };
 
 const getRoles = async (request, response) => {
-  let roles = request.user.roles;
-  roles = await Promise.all(roles.map(async (roleId) => {
+  const { roles } = retrieve_user_from_token(request.cookies.access_token);
+  let user_roles = await Promise.all(roles.map(async (roleId) => {
     const role = await Role.findOne({
       _id: roleId
     });
     return role.name;
   }));
-  successF('Voici mes roles', roles, 200, response);
+  return successF(
+    'Here my roles',
+    user_roles,
+    httpStatus.OK,
+    response
+  );
 };
 
 module.exports = {

@@ -25,7 +25,6 @@ const get_image_profil = async (req, namefile) => {
   };
   let url = s3_config.getSignedUrl('getObject', params);
   req.body.profile_image = url;
-  console.log(url);
 };
 
 
@@ -44,11 +43,8 @@ const push_image = (sub_folder) => (req, res, next) => {
 
   let arrayFile = Object.values(req.files);
   let arrayUrl = [];
-  // eslint-disable-next-line no-unused-vars
-  let f;
 
   arrayFile.forEach((file) => {
-    f = file;
     const timestamp = new Date().getTime();
     const extension = path.extname(file.name);
     const fileName = path.basename(file.name, extension);
@@ -80,9 +76,9 @@ const push_image = (sub_folder) => (req, res, next) => {
     arrayUrl.push(url);
   });
 
-  if (arrayUrl.length <= 0) {
+  if (arrayUrl.length === 0) {
     next();
-  } else if (arrayUrl.length == 1) {
+  } else if (arrayUrl.length === 1) {
     req.body.url_image = arrayUrl[0];
   } else {
     req.body.url_image = arrayUrl;

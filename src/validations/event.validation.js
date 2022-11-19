@@ -14,6 +14,7 @@ const create = {
     department: Joi.string().max(255).required()
   })
 };
+
 const search = {
   body: Joi.object().keys({
     category: Joi.string().required(),
@@ -21,10 +22,41 @@ const search = {
     code: Joi.string().allow(null),
     date: Joi.date().format('YYYY-MM-DD').utc().allow(null),
     numdepartment: Joi.string().required()
+  }),
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const retrieve = {
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const delete_event = {
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const cancel_event = {
+  body: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const submit_event = {
+  body: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
   })
 };
 
 module.exports = {
   create,
-  search
+  search,
+  retrieve,
+  cancel_event,
+  submit_event,
+  delete_event,
 };

@@ -4,8 +4,6 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 const types = mongoose.Schema.Types;
 
-
-
 const eventModel = new mongoose.Schema({
   creator: {
     type: types.ObjectId,

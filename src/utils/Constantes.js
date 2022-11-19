@@ -8,6 +8,8 @@ const uuid = () => {
 
 module.exports = Object.freeze({
   MESSAGE: {
+    PARAMS_IS_REQUIRED: 'Parameters in path are required',
+    QUERY_IS_REQUIRED: 'Queries in path are required',
     BODY_IS_REQUIRED: 'The body in request is required',
     REGISTER_SUCCES: 'Votre compte à correctement été enregistré, veuillez confirmer votre email',
     REGISTER_FAILED: 'Une erreur est survenue pendant la procédure d\'inscription',

@@ -5,59 +5,60 @@ const successF = require('../utils/success');
 const constants = require('../utils/Constantes');
 const errorF = require('../utils/error');
 const httpStatus = require('http-status');
+const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 
 const create = async (request, response) => {
-  try {
-    await eventService.create(request);
-    successF(constants.MESSAGE.CONFIRMATION_EVENT_ADD, true, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-  }
-};
-
-const validate = async (request, response) => {
-  try {
-    await eventService.validate(request);
-    successF('Event validé', true, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-  }
+  const { body: event } = request;
+  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
+  const event_created = await eventService.create(user_id, event);
+  return successF(
+    constants.MESSAGE.CONFIRMATION_EVENT_ADD,
+    event_created,
+    httpStatus.OK,
+    response
+  );
 };
 
 const getAll = async (request, response) => {
-  try {
-    request.filter.is_validate = true;
-    request.filter.date_time = {
-      $gte: Date.now()
-    };
-    const result = await eventService.getAll(request);
+  const { query } = request;
+  const { event_date, page, size } = query;
 
-    let arrayEvent = result;
-    // let arrayEvent = result.docs;
+  const search = {};
+  if (event_date) search.date = {
+    $gte: event_date || Date.now()
+  };
 
-    for (let i = 0; i < arrayEvent.length; i++) {
-      const category = await categoryService.FindOneById(arrayEvent[i].category);
-      arrayEvent[i]._doc.categoryComplet = category;
-      arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users.length;
+  const filter = {};
+  const result = await eventService.getAll(search, filter, page, size) || [];
 
-      // remove all fileds don't need
-      delete arrayEvent[i]._doc.description;
-      delete arrayEvent[i]._doc.price;
-      delete arrayEvent[i]._doc.time;
-      delete arrayEvent[i]._doc.users;
-      delete arrayEvent[i]._doc.is_validate;
-      delete arrayEvent[i]._doc.category;
-      delete arrayEvent[i]._doc.creator;
-    }
+  let arrayEvent = result;
+  // let arrayEvent = result.docs;
 
-    successF('OK', result, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+  for (let i = 0; i < arrayEvent.length; i++) {
+    const category = await categoryService.FindOneById(arrayEvent[i].category);
+    arrayEvent[i]._doc.categoryComplet = category;
+    arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users.length;
+
+    // remove all fileds don't need
+    delete arrayEvent[i]._doc.description;
+    delete arrayEvent[i]._doc.price;
+    delete arrayEvent[i]._doc.time;
+    delete arrayEvent[i]._doc.users;
+    delete arrayEvent[i]._doc.is_validate;
+    delete arrayEvent[i]._doc.category;
+    delete arrayEvent[i]._doc.creator;
   }
+  return successF(
+    'OK',
+    result,
+    httpStatus.OK,
+    response
+  );
 };
 
 const getAllFiltered = async (request, response) => {
-  const events = await eventService.getAllFiltered(request);
+  const { filter } = request;
+  const events = await eventService.getAllFiltered(filter);
   for (let i = 0; i < events.length; i++) {
     const category = await categoryService.FindOneById(events[i].category);
     events[i]._doc.categoryComplet = category;
@@ -72,101 +73,131 @@ const getAllFiltered = async (request, response) => {
     delete events[i]._doc.category;
     delete events[i]._doc.creator;
   }
-  successF('OK', events, 200, response);
+  return successF(
+    'OK',
+    events,
+    httpStatus.OK,
+    response
+  );
 };
 
 const getDetailsEvent = async (request, response) => {
-  try {
-    const event = await eventService.findOneById(request.params._id);
-    const category = await categoryService.FindOneById(event.category);
-    const usersIdArray = event.users.map(w => w.user_id);
+  const { params } = request;
+  const { event_id } = params;
+  const event = await eventService.findOneById(event_id);
+  const category = await categoryService.FindOneById(event.category);
+  const usersIdArray = event.users.map(w => w.user_id);
 
-    let eventObject = event?.toObject();
+  let eventObject = event?.toObject();
 
-    let filter;
-    if (request.CurrentUserIsAdmin == true) {
-      eventObject.CurrentUserIsAdmin = true;
-      filter = 'username telephone -_id';
-    } else {
-      eventObject.CurrentUserHasParticipant = request.CurrentUserHasParticipant;
-      filter = 'username -_id';
-    }
-
-    const userParticipate = await userService.findManyById(usersIdArray, filter);
-    const userCreator = await userService.findOne(event.creator, 'username -_id');
-
-    eventObject.category = category?.toObject();
-    eventObject.users = userParticipate.map(model => model.toObject());
-    eventObject.creator = userCreator?.toObject();
-
-
-    successF('OK', eventObject, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+  let filter;
+  if (request.CurrentUserIsAdmin) {
+    eventObject.CurrentUserIsAdmin = true;
+    filter = 'username telephone -_id';
+  } else {
+    eventObject.CurrentUserHasParticipant = request.CurrentUserHasParticipant;
+    filter = 'username -_id';
   }
+
+  const userParticipate = await userService.findManyById(usersIdArray, filter);
+  const userCreator = await userService.findOne(event.creator, 'username -_id');
+
+  eventObject.category = category?.toObject();
+  eventObject.users = userParticipate.map(model => model.toObject());
+  eventObject.creator = userCreator?.toObject();
+  return successF(
+    'OK',
+    eventObject,
+    httpStatus.OK,
+    response
+  );
 };
 
 const submitParticipation = async (request, response) => {
-  try {
-    await eventService.submitParticipant(request);
-    successF(constants.MESSAGE.DEMAND_PARTICIPATION_IS_OK, true, 200, response);
-  } catch (error) {
-    errorF(constants.MESSAGE.DEMAND_PARTICIPATION_IS_NOK, error, httpStatus.NOT_ACCEPTABLE, response);
-  }
+  const { body } = request;
+  const { event_id } = body;
+  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
+  await eventService.submitParticipant(user_id, event_id);
+  return successF(
+    constants.MESSAGE.DEMAND_PARTICIPATION_IS_OK,
+    true,
+    httpStatus.OK,
+    response
+  );
 };
 
 const cancelParticipation = async (request, response) => {
-  try {
-    await eventService.cancelParticipant(request);
-    successF(constants.MESSAGE.CANCEL_PARTICIPATION_ON_EVENT_OK, true, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-  }
+  const { body } = request;
+  const { event_id } = body;
+  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
+  await eventService.cancelParticipant(user_id, event_id);
+  return successF(
+    constants.MESSAGE.CANCEL_PARTICIPATION_ON_EVENT_OK,
+    true,
+    httpStatus.OK,
+    response
+  );
 };
 
 const cancelEvent = async (request, response) => {
-  try {
-    const event = await eventService.cancelEvent(request.params._id);
-    if (event.date_time.getFullYear() != 0) {
-      var error = new Error('Une erreur est survenue pendant l\'annulation de l\'évènement');
-      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-    }
-    successF(constants.MESSAGE.CANCEL_EVENT_OK, true, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+  const { params } = request;
+  const { event_id } = params;
+  const event = await eventService.cancelEvent(event_id);
+  if (event.date_time.getFullYear() != 0) {
+    var error = new Error('Error in event anulation');
+    errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
+  return successF(
+    constants.MESSAGE.CANCEL_EVENT_OK,
+    true,
+    httpStatus.OK,
+    response
+  );
 };
 
 const search = async (request, response) => {
-  try {
-    const arrayEvent = await eventService.searchEvents(request);
+  const arrayEvent = await eventService.searchEvents(request);
 
-    for (let i = 0; i < arrayEvent.length; i++) {
-      const category = await categoryService.FindOneById(arrayEvent[i].category);
-      arrayEvent[i]._doc.categoryComplet = category;
+  for (let i = 0; i < arrayEvent.length; i++) {
+    const category = await categoryService.FindOneById(arrayEvent[i].category);
+    arrayEvent[i]._doc.categoryComplet = category;
 
-      // remove all fileds don't need
-      delete arrayEvent[i]._doc.category;
-    }
-
-    if (arrayEvent.length == 0) {
-      var error = new Error('Aucun évènement n\'à été trouvé avec cet recherche');
-      return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
-    }
-    successF('ok', arrayEvent, 200, response);
-  } catch (error) {
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+    // remove all fileds don't need
+    delete arrayEvent[i]._doc.category;
   }
+
+  if (arrayEvent.length == 0) {
+    var error = new Error('Event not found');
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
+  }
+  return successF(
+    'OK',
+    arrayEvent,
+    httpStatus.OK,
+    response
+  );
+};
+
+const validate = async (request, response) => {
+  const { params } = request;
+  const { event_id } = params;
+  await eventService.validate(event_id);
+  return successF(
+    'Event validé',
+    true,
+    httpStatus.OK,
+    response
+  );
 };
 
 module.exports = {
   create,
-  validate,
   getAll,
   getDetailsEvent,
   submitParticipation,
   cancelParticipation,
   cancelEvent,
   search,
-  getAllFiltered
+  getAllFiltered,
+  validate,
 };
