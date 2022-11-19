@@ -4,9 +4,9 @@ const config = require('../config');
 const jwt = require('jsonwebtoken');
 const SearchDefaultValue = 'username email';
 
-const create = async (userBody) => {
-  userBody.password = bcrypt.hashSync(userBody.password, 10);
-  return User.create(userBody);
+const create = async (user_body) => {
+  user_body.password = bcrypt.hashSync(user_body.password, 10);
+  return User.create(user_body);
 };
 
 const findOneAndUpdate = async (email_user) => {
@@ -21,12 +21,12 @@ const findOneAndUpdate = async (email_user) => {
   return user;
 };
 
-const findOne = async (_id, searchField = SearchDefaultValue) => {
-  return await User.findById(_id).select(searchField);
+const findOne = async (user_id, searchField = SearchDefaultValue) => {
+  return await User.findById(user_id).select(searchField);
 };
 
-const findManyById = async (_userid, searchField = SearchDefaultValue) => {
-  return await User.find({ '_id': { $in: _userid } }).select(searchField);
+const findManyById = async (user_id, searchField = SearchDefaultValue) => {
+  return await User.find({ '_id': { $in: user_id } }).select(searchField);
 };
 
 const findManyUsersByUserArrayNoAsync = (_userArrayId, searchField = SearchDefaultValue) => {

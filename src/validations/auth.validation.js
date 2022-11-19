@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const schema_register = {
+const register = {
   body: Joi.object({
     username: Joi.string()
       .regex(/(^[a-zA-Z0-9_]+$)/)
@@ -13,6 +13,9 @@ const schema_register = {
     confirm_password: Joi.string().valid(Joi.ref('password')).required(),
     telephone: Joi.string().regex(/(^[0-9]+$)/),
     url_image: Joi.any(),
+  }),
+  query: Joi.object({
+    key: Joi.string()
   })
 };
 
@@ -24,6 +27,6 @@ const login = {
 };
 
 module.exports = {
-  register: schema_register,
+  register,
   login,
 };

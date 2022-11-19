@@ -5,16 +5,18 @@ const errorF = require('../utils/error');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
 
-const isUniqueMail = async (req, res, next) => {
+const isUniqueMail = async (request, response, next) => {
+  const { body } = request;
+  const { email } = body;
   const user = await User.findOne({
-    email: req.body.email,
+    email: email,
   });
 
-  if (user) {
+  if (user || !Object.keys(user).length) {
     const error = new Error(constants.MESSAGE.EMAIL_ALSO_EXIST);
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   } else {
-    return next();
+    next();
   }
 };
 
@@ -25,56 +27,44 @@ const isValidate = async (req, res, next) => {
 
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
-    errorF(error.message, error, httpStatus.UNAUTHORIZED, res, next);
+    return errorF(error, httpStatus.UNAUTHORIZED, res);
   }
   else if (!user.is_validate) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_NOT_MADE);
-    errorF(error.message, error, httpStatus.UNAUTHORIZED, res, next);
+    return errorF(error, httpStatus.UNAUTHORIZED, res);
   } else {
-    return next();
+    next();
   }
 };
 
-const isConnected = async (req, res, next) => {
-  const token = req.cookies?.access_token;
+const retrieve_user_from_token = async (token) => {
+  const user = jwt.verify(token, config.token.secret);
+  return user.userId;
+};
 
+const user_is_connected = async (request, response, next) => {
+  const token = request?.cookies?.access_token;
   if (!token) {
-    const err = new Error('Il semblerait qu\'il manque le token');
-    errorF(err.message, err, httpStatus.UNAUTHORIZED, res, next);
+    const error = new Error('Il semblerait qu\'il manque le token');
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
-  else {
-    jwt.verify(token, config.token.secret, (error, user) => {
-      if (error) {
-        res.clearCookie('access_token'); // s'assure qu'il n'y a pas de token en mémoire coté client
-        errorF('Vous n\'êtes pas connecté', error, httpStatus.UNAUTHORIZED, res, next);
-      }
-      if (!user) { // dans le cas où le token expire entre temps de connexion et de suppression client
-        return next();
-      } else {
-        req.user = user;
-        next();
-      }
-    });
-  }
+  next();
 };
 
-// const isMine = (schema) => async (req, res, next) => {
-//   const userId = req.user.userId;
-
-// };
-
-const isAdmin = async (req, res, next) => {
-  const roles = req.user.roles;
+const isAdmin = async (request, response, next) => {
+  const roles = request.user.roles;
   if (roles.includes('619f8c5e274ed82841f49d6e')) {
-    return next();
+    next();
+  } else {
+    const error = new Error('Vous n\'êtes pas autorisé');
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
-  const error = new Error('Vous n\'êtes pas autorisé');
-  errorF(error.message, error, httpStatus.UNAUTHORIZED, res, next);
 };
 
 module.exports = {
   isUniqueMail,
   isValidate,
-  isConnected,
-  isAdmin
+  user_is_connected,
+  isAdmin,
+  retrieve_user_from_token
 };
