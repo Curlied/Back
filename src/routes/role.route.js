@@ -6,10 +6,19 @@ const roleValidation = require('../validations/role.validation');
 
 const router = express.Router();
 
-router.post('/', validate(roleValidation.create), roleController.create);
-router.put('/:_id', validate(roleValidation.create), roleController.update);
-router.get('/:_id', validate(null), roleController.getOne);
+// all these path are not protect with isconnect middleware ? 
+// any users can change or update roles. 
+
+
 router.get('/', validate(null), roleController.getAll);
+
+router.get('/:_id', validate(null), roleController.getOne);
+
+router.post('/', validate(roleValidation.create), roleController.create);
+
+router.put('/:_id', validate(roleValidation.create), roleController.update);
+
+
 
 
 

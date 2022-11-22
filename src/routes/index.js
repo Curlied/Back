@@ -6,6 +6,9 @@ const categoryRoute = require('./category.route');
 const userRoute = require('./user.route');
 const router = express.Router();
 
+
+// Should not make filenames and their exports plural for homogeneity ?
+
 const defaultRoutes = [
   {
     path: '/auth',
