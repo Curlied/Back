@@ -17,9 +17,21 @@ jobs:
         with:
           args: '> 💬 Starting CI workflow for `${{ github.repository }}` on ${{ github.ref_type }}: `${{ github.ref_name }}`. See progress at https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}.'
 
+jobs:
+  test_vercel:
+    name: Test Vercel
+    if: github.event.deployment_status.state == "success"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Audit Vercel preview URL using Lighthouse
+        uses: treosh/lighthouse-ci-action@v3
       - name: Discord notification build end
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
           args: '> ✅ Deploy succeed for `${{ github.repository }}` on ${{ github.ref_type }}: `${{ github.ref_name }}`'
+    
+
+
