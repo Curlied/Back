@@ -1,8 +1,9 @@
 name: test
 on: [deployment_status]
+needs: [backend_build]
 jobs:
   production-deploy:
-    if: github.event.deployment_status.created.state == 'success'
+    if: github.event.deployment_status.created.state != 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
