@@ -19,8 +19,10 @@ jobs:
 
   test_vercel:
     name: Test Vercel
-    if: 'github.event.deployment_status.state == "success"'
     runs-on: ubuntu-latest
+    # only run if success deploy
+    needs: build
+    if: ${{ github.event.deployment_status.state == "success"}}
     steps:
       - uses: actions/checkout@v2
       - name: Discord notification build end
