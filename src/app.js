@@ -8,7 +8,6 @@ const routes = require('./routes');
 const fileUpload = require('express-fileupload');
 const errorF = require('./utils/error');
 const cookieParser = require('cookie-parser');
-const serverless = require('serverless-http');
 
 const whitelist = [config.url_front];
 const corsOptions = {
@@ -60,4 +59,3 @@ app.use((req, res, next) => {
 });
 
 module.exports = app;
-module.exports.handler = serverless(app);
