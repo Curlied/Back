@@ -1,0 +1,14 @@
+name: test
+on: [deployment_status]
+jobs:
+  production-deploy:
+    if: github.event.deployment_status.created == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Discord notification build start
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '> pog'
