@@ -2,10 +2,11 @@ name: test
 on: [deployment_status]
 jobs:
   production-deploy:
-    if: github.event.deployment_status.created == 'success'
+    if: github.event.deployment_status.created.state == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@v2
       - name: Discord notification build start
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
