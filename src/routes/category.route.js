@@ -19,7 +19,7 @@ const router = express.Router();
  *      description: Can be used to get a list of possible categories to search for events
  *      responses:
  *       200:
- *         description: the list of the posts
+ *         description: the list of the category
  *         content:
  *           application/json:
  *             schema:
@@ -45,7 +45,7 @@ router.get('/', filterF(filterAllowed), categoryController.getAll);
 *      description: Can be used to get a category by id
 *      responses:
 *       200:
-*         description: the list of the posts
+*         description: the list of the category
 *         content:
 *           application/json:
 *             schema:

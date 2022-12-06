@@ -21,10 +21,31 @@ const {
 } = require('../middlewares/event.middleware');
 const router = express.Router();
 
-
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *      produces:
+ *        - application/json
+ *      summary: Retrieve a list of all event
+ *      tags: [events]
+ *      description: Can be used to get all paged events
+ *      responses:
+ *       200:
+ *         description: the list of the events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+*/
 router.get('/', filterF(filterAllowed), eventController.getAll);
+
+// nok should be events/:_id
 router.get('/detailsevent/:_id', [isConnected, eventExistAndNotDone, ifUserIsAdminEvent, ifUserParticipeOnEvent], eventController.getDetailsEvent); 
+
 router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
+
+// should be put for update an event
 router.get('/:_id/validate', [isConnected, isAdmin], eventController.validate);
 
 router.post('/search', validate(eventValidation.search), eventController.search);
@@ -33,6 +54,7 @@ router.post('/', [isConnected, validate(eventValidation.create), push_image('eve
 router.put('/submit-participation', [isConnected, userCanParticipateOnEvent], eventController.submitParticipation);
 router.put('/cancel-participation', [isConnected, userCanCancelParticipationOnEvent], eventController.cancelParticipation);
 
+// should be delete without word cancel : events/id on delete action.
 router.delete('/cancel/:_id', [isConnected, userCanCancelEvent], eventController.cancelEvent);
 
 // router.get('/:_id', validate(null), eventController.getOne);
