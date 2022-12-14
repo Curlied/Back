@@ -1,5 +1,6 @@
 name: Deployed on Vercel
-on: [deployment_status, push]
+on:
+  - deployment_status
 jobs:
   production-deploy-succes:
     if: github.event.deployment_status.state == 'success'
