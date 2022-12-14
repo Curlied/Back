@@ -7,8 +7,8 @@ const filterF = (allowed = []) => (request, response, next) => {
   const {
     filter
   } = request.query;
-  var isRight = true;
-  var filterTrue = {};
+  let isRight = true;
+  let filterTrue = {};
   let isAdmin = false;
   const token = request.cookies?.access_token;
 

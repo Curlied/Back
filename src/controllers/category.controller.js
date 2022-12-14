@@ -32,17 +32,8 @@ const getOne = async (request, response) => {
 };
 
 const getAll = async (request, response) => {
-  // const { query } = request;
-  // const { name, description, page, size } = query;
-
-  // const search = {};
-  // if (name) search.name = name;
-  // if (description) search.description = description;
-
-  // const filter = ['name', 'description'];
-
   const categories = await categoryService.getAll(request) || [];
-  return successF('Ok', categories, httpStatus.OK, response);
+  return successF('OK', categories, httpStatus.OK, response);
 };
 
 module.exports = {

@@ -65,11 +65,11 @@ const login = async (email, password) => {
 };
 
 const getAge = (birth_date) => {
-  var now = new Date();
-  var current_year = now.getFullYear();
-  var year_diff = current_year - birth_date.getFullYear();
-  var birthday_this_year = new Date(current_year, birth_date.getMonth(), birth_date.getDate());
-  var has_had_birthday_this_year = (now >= birthday_this_year);
+  const now = new Date();
+  const current_year = now.getFullYear();
+  const year_diff = current_year - birth_date.getFullYear();
+  const birthday_this_year = new Date(current_year, birth_date.getMonth(), birth_date.getDate());
+  const has_had_birthday_this_year = (now >= birthday_this_year);
 
   return has_had_birthday_this_year
     ? year_diff

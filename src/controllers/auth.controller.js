@@ -39,7 +39,7 @@ const login = async (request, response) => {
   const { email, password } = body;
   const { token, username } = await userService.login(email, password);
   if (!token) {
-    var error = new Error('Invalid Credentials');
+    const error = new Error('Invalid Credentials');
     return errorF(error, httpStatus.BAD_REQUEST, response);
   }
   response.cookie('access_token', token, {

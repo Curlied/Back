@@ -59,7 +59,7 @@ const push_image = (sub_folder) => (req, res, next) => {
       ContentType: 'image/jpeg',
     };
 
-    var putObjectPromise = s3_config.putObject(params).promise();
+    const putObjectPromise = s3_config.putObject(params).promise();
 
     putObjectPromise.catch(() => {
       const errorMessage = new Error(constants.MESSAGE.IMAGE_USER_NOT_UPLOAD);

@@ -16,7 +16,7 @@ const update = async (request, response) => {
     const error = new Error('Role not found');
     return errorF(error, httpStatus.NOT_FOUND, response);
   }
-  return successF('Ok', role, httpStatus.OK, response);
+  return successF('OK', role, httpStatus.OK, response);
 };
 
 const getOne = async (request, response) => {
@@ -27,7 +27,7 @@ const getOne = async (request, response) => {
     const error = new Error('Role not found');
     return errorF(error, httpStatus.NOT_FOUND, response);
   }
-  return successF('Ok', role, httpStatus.OK, response);
+  return successF('OK', role, httpStatus.OK, response);
 };
 
 const getAll = async (request, response) => {
@@ -38,7 +38,7 @@ const getAll = async (request, response) => {
   if (name) search.name = name;
   const filter = ['name'];
   const roles = await roleService.getAll(search, filter, page, size) || [];
-  return successF('Ok', roles, httpStatus.OK, response);
+  return successF('OK', roles, httpStatus.OK, response);
 };
 
 module.exports = {

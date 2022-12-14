@@ -135,7 +135,7 @@ const cancelEvent = async (request, response) => {
   const { event_id } = params;
   const event = await eventService.cancelEvent(event_id);
   if (event.date_time.getFullYear() != 0) {
-    var error = new Error('Error in event anulation');
+    const error = new Error('Error in event anulation');
     errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
   return successF(
@@ -158,7 +158,7 @@ const search = async (request, response) => {
   }
 
   if (arrayEvent.length == 0) {
-    var error = new Error('Event not found');
+    const error = new Error('Event not found');
     return errorF(error, httpStatus.NOT_FOUND, response);
   }
   return successF(
