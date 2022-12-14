@@ -21,11 +21,62 @@ const {
 } = require('../middlewares/event.middleware');
 const router = express.Router();
 
-
+/**
+ * GET /events
+ * @summary Return all events not finish
+ * @security BearerAuth
+ * @tags events
+ * @return {array<Event>} 200 - success response - application/json
+ * @example response - 200 - success response example
+ */
 router.get('/', filterF(filterAllowed), eventController.getAll);
 
-// nok should be events/:_id
-router.get('/detailsevent/:_id', [isConnected, eventExistAndNotDone, ifUserIsAdminEvent, ifUserParticipeOnEvent], eventController.getDetailsEvent); 
+/**
+ * GET /events/{id}
+ * @summary Return detail event
+ * @param {string} id.path.required - id mongo of event
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 200 - success response - application/json
+ * @example response - 200 - success response example
+ * {
+ *    "creator": {
+ *      "username": "test10"
+ *    },
+ *    "name": "bocuse",
+ *    "category": {
+ *      "name": "Restaurant",
+ *      "url_image": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/background/bg-restaurant.jpg",
+ *      "url_icon": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/svg/restaurant.svg"
+ *    },
+ *    "date_time": "2023-01-01T20:07:11.382Z",
+ *    "user_max": 6,
+ *    "place": "43 Quai Bonaparte",
+ *    "time": 18,
+ *    "price": 93,
+ *    "description": "Vous êtes riche ? non ? ba venez pas , je payerais pas votre part !",
+ *    "is_validate": true,
+ *    "created_at": "2021-07-11T09:55:35.037Z",
+ *    "code": "73100-Aix-les-Bains",
+ *    "department": "Savoie",
+ *    "url_image": [
+ *      "https://loremflickr.com/320/240/Abstract/any?lock=1669526051"
+ *    ],
+ *    "__v": 0,
+ *    "users_waiting": [
+ *      {
+ *        "user_id": "01230561afbfbsd"
+ *      }
+ *    ],
+ *    "users_valide": [
+ *      {
+ *        "user_id": "01230561afbfbsd"
+ *      }
+ *    ],
+ *    "CurrentUserIsAdmin": false
+ *  } 
+ */
+router.get('/:_id', [isConnected, eventExistAndNotDone, ifUserIsAdminEvent, ifUserParticipeOnEvent], eventController.getDetailsEvent); 
 
 router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
 

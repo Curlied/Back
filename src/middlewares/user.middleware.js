@@ -36,7 +36,7 @@ const isValidate = async (req, res, next) => {
 };
 
 const isConnected = async (req, res, next) => {
-  const token = req.headers.authorization.split('Bearer ')[1];
+  const token = req.headers.authorization?.split('Bearer ')[1];
   
   if (!token) {
     const err = new Error('Il semblerait qu\'il manque le token');
