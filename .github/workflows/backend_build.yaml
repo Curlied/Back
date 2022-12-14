@@ -2,7 +2,6 @@ name: Send webhook
 on:
   push:
     branches-ignore: main
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,3 +19,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+       - name: Discord notification sonarcloud end
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '> Sonarcloud analysis finished for `${{ github.repository }}` on ${{ github.ref_type }}: `${{ github.ref_name }}`. See results at https://sonarcloud.io/summary/new_code?id=curlied-back&branch=${{ github.ref_name }}.'

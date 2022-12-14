@@ -1,5 +1,6 @@
 name: test
-on: [deployment_status, build_backend]
+on:
+  - deployment_status
 jobs:
   production-deploy-succes:
     if: github.event.deployment_status.state == 'success'
