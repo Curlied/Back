@@ -8,9 +8,7 @@ const routes = require('./routes');
 const fileUpload = require('express-fileupload');
 const errorF = require('./utils/error');
 const cookieParser = require('cookie-parser');
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-
+const expressJSDocSwagger = require('express-jsdoc-swagger');
 const whitelist = [config.url_front];
 const corsOptions = {
   credentials: true, // This is important.
@@ -19,6 +17,46 @@ const corsOptions = {
       return callback(null, true);
     callback(new Error('Not allowed by CORS'));
   }
+};
+const options = {
+  info: {
+    version: '1.0.0',
+    title: 'Curlied swagger',
+    license: {
+      name: 'MIT',
+    },
+  },
+  security: {
+    BearerAuth: {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    }
+  },
+  baseDir: __dirname,
+  // Glob pattern to find your jsdoc files (multiple patterns can be added in an array)
+  filesPattern: './**/*.js',
+  // URL where SwaggerUI will be rendered
+  swaggerUIPath: '/docs',
+  // Expose OpenAPI UI
+  exposeSwaggerUI: true,
+  // Expose Open API JSON Docs documentation in `apiDocsPath` path.
+  exposeApiDocs: false,
+  // Open API JSON Docs endpoint.
+  apiDocsPath: '/v3/api-docs',
+  // Set non-required fields as nullable by default
+  notRequiredAsNullable: false,
+  // You can customize your UI options.
+  // you can extend swagger-ui-express config. You can checkout an example of this
+  // in the `example/configuration/swaggerOptions.js`
+  swaggerUiOptions: {},
+  // multiple option in case you want more that one instance
+  multiple: true,
+  servers: [
+    {
+      url: 'http://localhost:3000/api',
+    }
+  ]
 };
 
 const app = express();
@@ -32,36 +70,6 @@ app.use(helmet());
 app.use(express.json());
 app.use(fileUpload());
 
-const swaggerDefinition = {
-  openapi: '3.0.0',
-  info: {
-    title: 'Express API for JSONPlaceholder',
-    version: '1.0.0',
-    description:
-      'This is a REST API application made with Express. It retrieves data from JSONPlaceholder.',
-    license: {
-      name: 'Licensed Under MIT',
-      url: 'https://spdx.org/licenses/MIT.html',
-    },
-    contact: {
-      name: 'JSONPlaceholder',
-      url: 'https://jsonplaceholder.typicode.com',
-    },
-  },
-  servers: [
-    {
-      url: 'http://localhost:3000/api',
-      description: 'Development server',
-    },
-  ],
-};
-
-const options = {
-  swaggerDefinition,
-  // Paths to files containing OpenAPI definitions
-  apis: ['./src/routes/*.js'],
-};
-const swaggerSpec = swaggerJSDoc(options);
 
 // Routes to test the API
 app.get('/', (req, res) => {
@@ -84,8 +92,7 @@ app.use((error, req, res, next) => {
   }
 });
 
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+expressJSDocSwagger(app)(options);
 // All the api routes
 app.use('/api', routes);
 

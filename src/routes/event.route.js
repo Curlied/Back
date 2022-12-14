@@ -21,23 +21,7 @@ const {
 } = require('../middlewares/event.middleware');
 const router = express.Router();
 
-/**
- * @swagger
- * /events:
- *   get:
- *      produces:
- *        - application/json
- *      summary: Retrieve a list of all event
- *      tags: [events]
- *      description: Can be used to get all paged events
- *      responses:
- *       200:
- *         description: the list of the events
- *         content:
- *           application/json:
- *             schema:
- *               type: object
-*/
+
 router.get('/', filterF(filterAllowed), eventController.getAll);
 
 // nok should be events/:_id

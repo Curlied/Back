@@ -62,11 +62,7 @@ const login = catchAsync(async (req, res, next) => {
       var error = new Error('L\'adresse mail ou le mot de passe est invalide');
       errorF(error.message, error, httpStatus.BAD_REQUEST, res, next);
     } else {
-      res.cookie('access_token', token, {
-        httpOnly: true,
-        secure: configs.environment === 'prod',
-      });
-      successF('La connexion à bien été effectué', data.username, 200, res, next);
+      successF('La connexion à bien été effectué', { username: data.username, token }, 200, res, next);
     }
   }
   catch (error) {
