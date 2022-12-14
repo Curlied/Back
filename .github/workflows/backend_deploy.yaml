@@ -1,4 +1,4 @@
-name: test
+name: Deployed on Vercel
 on: [deployment_status, push]
 jobs:
   production-deploy-succes:
