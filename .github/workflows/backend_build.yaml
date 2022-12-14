@@ -23,30 +23,3 @@ jobs:
         uses: Ilshidur/action-discord@master
         with:
           args: '> Sonarcloud analysis finished for `${{ github.repository }}` on ${{ github.ref_type }}: `${{ github.ref_name }}`. See results at https://sonarcloud.io/summary/new_code?id=curlied-back&branch=${{ github.ref_name }}.'
-  production-deploy-succes:
-    needs: [build]
-    if: github.event.deployment_status.state == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-      - name: Discord notification deployed
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        uses: Ilshidur/action-discord@master
-        with:
-          args: '> The site as been deployed on : `${{
-            github.event.deployment_status.target_url }}`'
-  production-deploy-failed:
-    needs: [build]
-    if: github.event.deployment_status.state == 'failure'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-      - name: Discord notification deployed
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        uses: Ilshidur/action-discord@master
-        with:
-          args: '> An error occured during the deployment of the site '
