@@ -1,7 +1,5 @@
 name: Send webhook
-on:
-  push:
-    branches-ignore: main
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,7 +17,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-       - name: Discord notification sonarcloud end
+      - name: Discord notification sonarcloud end
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
