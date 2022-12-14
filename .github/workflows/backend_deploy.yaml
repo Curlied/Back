@@ -1,6 +1,5 @@
 name: test
-on:
-  - deployment_status
+on: [deployment_status, build_backend]
 jobs:
   production-deploy-succes:
     if: github.event.deployment_status.state == 'success'
@@ -13,7 +12,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '> Le site à été déployé sur : `${{
+          args: '> The site as been deployed on : `${{
             github.event.deployment_status.target_url }}`'
   production-deploy-failed:
     if: github.event.deployment_status.state == 'failure'
@@ -26,4 +25,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '> Le site à échoué à déployer'
+          args: '> An error occured during the deployment of the site '
