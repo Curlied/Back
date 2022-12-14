@@ -1,7 +1,9 @@
+---
 name: test
-on: [deployment_status]
+on:
+  - deployment_status
 jobs:
-  production-deploy:
+  production-deploy-succes:
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
@@ -12,7 +14,9 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '> Le site à été déployé sur : `${{ github.event.deployment_status.target_url }}`'
+          args: '> Le site à été déployé sur : `${{
+            github.event.deployment_status.target_url }}`'
+  production-deploy-failed:
     if: github.event.deployment_status.state == 'failure'
     runs-on: ubuntu-latest
     steps:
