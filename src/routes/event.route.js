@@ -1,10 +1,11 @@
 const router = require('express').Router();
-const { body_validator } = require('../middlewares/validate');
 const eventController = require('../controllers/event.controller');
 const eventValidation = require('../validations/event.validation');
 const {
   push_image
 } = require('../middlewares/digitalocean.middleware');
+const filterF = require('../middlewares/filter.middleware');
+const filterAllowed = ['name'];
 const {
   user_is_connected,
   isAdmin
@@ -20,7 +21,7 @@ const {
 
 // import common middlewares
 const { check_params_exist, check_body_exist } = require('../middlewares/common');
-const { params_validator } = require('../middlewares/validate');
+const { body_validator, params_validator } = require('../middlewares/validate');
 
 router.post('/',
   user_is_connected,
@@ -30,6 +31,7 @@ router.post('/',
 );
 
 router.get('/',
+  filterF(filterAllowed),
   eventController.getAll
 );
 
@@ -52,6 +54,7 @@ router.put('/submit-participation',
 router.put('/cancel-participation',
   user_is_connected,
   check_body_exist, body_validator(eventValidation.cancel_event),
+  ifUserIsAdminEvent,
   userCanCancelParticipationOnEvent,
   eventController.cancelParticipation
 );

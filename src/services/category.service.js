@@ -9,9 +9,9 @@ const getAll = async (search, filter, page, size) => {
   return await pagination(Category, search, filter, page, size);
 };
 
-const update = async (object_id, body) => {
+const update = async (category_id, body) => {
   const category = await Category.findOneAndUpdate({
-    _id: object_id
+    _id: category_id
   }, body, {
     new: true
   });

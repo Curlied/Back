@@ -21,8 +21,8 @@ const findById = async (request, response) => {
 };
 
 const myProfilDetailsUsers = async (request, response) => {
-  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
-  const user = await userService.findOne(user_id, 'username birth_date url_image');
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const user = await userService.findOne(userId, 'username birth_date url_image');
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
     return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
@@ -32,7 +32,7 @@ const myProfilDetailsUsers = async (request, response) => {
 
   /*==  EVENT USERS: ==*/
   // historique event create
-  const allEventsCreate = await eventService.findAllByCreatorForMyProfil(user_id);
+  const allEventsCreate = await eventService.findAllByCreatorForMyProfil(userId);
   const allEventCreateInProgress = allEventsCreate.filter(x => x.date_time > Date.now());
 
   for (let i = 0; i < allEventCreateInProgress.length; i++) {
@@ -49,7 +49,7 @@ const myProfilDetailsUsers = async (request, response) => {
     'username': user.username,
     'age': age,
     'url_image': user.url_image,
-    'description': '',
+    'description': 'Pionnièr(e) passionné(e) du Web. Praticien amateur de la culture pop. Amoureux d\'Internet. Accro au café. Spécialiste de la musique. Geek au bacon.',
     'eventInProgress': allEventCreateInProgress
   };
 
@@ -62,9 +62,9 @@ const myProfilDetailsUsers = async (request, response) => {
 };
 
 const personalInformationsDetailsUser = async (request, response) => {
-  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
   const searchField = 'username description email birth_date telephone url_image';
-  const user = await userService.findOne(user_id, searchField);
+  const user = await userService.findOne(userId, searchField);
 
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
@@ -91,8 +91,8 @@ const personalInformationsDetailsUser = async (request, response) => {
 const getAllEventsFromSpaceUser = async (request, response) => {
   /*==  EVENT USERS: ==*/
   // historique event create
-  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
-  const allEventsCreate = await eventService.findAllForSpaceUserByCreator(user_id);
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const allEventsCreate = await eventService.findAllForSpaceUserByCreator(userId);
   const allEventCreateInProgress = await allEventsCreate.filter(x => x.date_time > Date.now());
 
   // get category
@@ -131,7 +131,7 @@ const getAllEventsFromSpaceUser = async (request, response) => {
   }
 
   //Evénements Participé
-  const allEventRequestParticipate = await eventService.findAllEventsUserParticpateIn(user_id);
+  const allEventRequestParticipate = await eventService.findAllEventsUserParticpateIn(userId);
   const allEventParticipateInProgress = allEventRequestParticipate.filter(x => x.date_time > Date.now());
 
   for (let i = 0; i < allEventParticipateInProgress.length; i++) {
@@ -143,7 +143,7 @@ const getAllEventsFromSpaceUser = async (request, response) => {
       'url_icon': categorytName.url_icon,
     };
 
-    const currentUser = allEventParticipateInProgress[i].users.find(usr => usr.user_id == user_id);
+    const currentUser = allEventParticipateInProgress[i].users.find(usr => usr.user_id == userId);
     allEventParticipateInProgress[i]._doc.statusCurrentUser = currentUser._doc.status;
     delete allEventParticipateInProgress[i]._doc.users;
   }
@@ -162,7 +162,7 @@ const getAllEventsFromSpaceUser = async (request, response) => {
 };
 
 const getRoles = async (request, response) => {
-  const { roles } = retrieve_user_from_token(request.cookies.access_token);
+  const { roles } = await retrieve_user_from_token(request.cookies.access_token);
   let user_roles = await Promise.all(roles.map(async (roleId) => {
     const role = await Role.findOne({
       _id: roleId

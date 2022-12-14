@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const categoryController = require('../controllers/category.controller');
 const categoryValidation = require('../validations/category.validation');
+const filterF = require('../middlewares/filter.middleware');
+const filterAllowed = ['name', 'description'];
 
 // import common middlewares
 const { check_body_exist, check_params_exist } = require('../middlewares/common');
@@ -22,7 +24,7 @@ router.get('/:category_id',
   categoryController.getOne
 );
 
-router.get('/',
+router.get('/', filterF(filterAllowed),
   categoryController.getAll
 );
 
