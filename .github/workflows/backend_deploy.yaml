@@ -1,6 +1,5 @@
 name: test
-on:
-  - deployment_status
+on: [deployment_status, push]
 jobs:
   production-deploy-succes:
     if: github.event.deployment_status.state == 'success'
