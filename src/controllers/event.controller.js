@@ -9,8 +9,8 @@ const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 
 const create = async (request, response) => {
   const { body: event } = request;
-  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
-  const event_created = await eventService.create(user_id, event);
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const event_created = await eventService.create(userId, event);
   return successF(
     constants.MESSAGE.CONFIRMATION_EVENT_ADD,
     event_created,
@@ -19,19 +19,10 @@ const create = async (request, response) => {
   );
 };
 
-const getAll = async (request, response) => {
-  const { query } = request;
-  const { event_date, page, size } = query;
+const getAll = async (_request, response) => {
+  const events = await eventService.getAll() || [];
 
-  const search = {};
-  if (event_date) search.date = {
-    $gte: event_date || Date.now()
-  };
-
-  const filter = {};
-  const result = await eventService.getAll(search, filter, page, size) || [];
-
-  let arrayEvent = result;
+  let arrayEvent = events;
   // let arrayEvent = result.docs;
 
   for (let i = 0; i < arrayEvent.length; i++) {
@@ -50,7 +41,7 @@ const getAll = async (request, response) => {
   }
   return successF(
     'OK',
-    result,
+    events,
     httpStatus.OK,
     response
   );
@@ -116,8 +107,8 @@ const getDetailsEvent = async (request, response) => {
 const submitParticipation = async (request, response) => {
   const { body } = request;
   const { event_id } = body;
-  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
-  await eventService.submitParticipant(user_id, event_id);
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  await eventService.submitParticipant(userId, event_id);
   return successF(
     constants.MESSAGE.DEMAND_PARTICIPATION_IS_OK,
     true,
@@ -129,8 +120,8 @@ const submitParticipation = async (request, response) => {
 const cancelParticipation = async (request, response) => {
   const { body } = request;
   const { event_id } = body;
-  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
-  await eventService.cancelParticipant(user_id, event_id);
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  await eventService.cancelParticipant(userId, event_id);
   return successF(
     constants.MESSAGE.CANCEL_PARTICIPATION_ON_EVENT_OK,
     true,
@@ -168,7 +159,7 @@ const search = async (request, response) => {
 
   if (arrayEvent.length == 0) {
     var error = new Error('Event not found');
-    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
+    return errorF(error, httpStatus.NOT_FOUND, response);
   }
   return successF(
     'OK',

@@ -14,11 +14,11 @@ const categorySchema = new mongoose.Schema({
   },
   url_image: {
     type: types.String,
-    required: true
+    required: false
   },
   url_icon: {
     type: types.String,
-    required: true
+    required: false
   },
   versionKey: false
 });

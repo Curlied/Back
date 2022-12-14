@@ -37,19 +37,18 @@ const register = async (request, response) => {
 const login = async (request, response) => {
   const { body } = request;
   const { email, password } = body;
-  const data = await userService.login(email, password);
-  if (!data) {
+  const { token, username } = await userService.login(email, password);
+  if (!token) {
     var error = new Error('Invalid Credentials');
     return errorF(error, httpStatus.BAD_REQUEST, response);
   }
-  const token = data.token;
   response.cookie('access_token', token, {
     httpOnly: true,
     secure: configs.environment === 'prod',
   });
   return successF(
     'The connection has been done',
-    data.username,
+    username,
     httpStatus.OK,
     response
   );

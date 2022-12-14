@@ -12,7 +12,7 @@ const isUniqueMail = async (request, response, next) => {
     email: email,
   });
 
-  if (user || !Object.keys(user).length) {
+  if (user) {
     const error = new Error(constants.MESSAGE.EMAIL_ALSO_EXIST);
     return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   } else {
@@ -38,8 +38,7 @@ const isValidate = async (req, res, next) => {
 };
 
 const retrieve_user_from_token = async (token) => {
-  const user = jwt.verify(token, config.token.secret);
-  return user.userId;
+  return await jwt.verify(token, config.token.secret);
 };
 
 const user_is_connected = async (request, response, next) => {
@@ -53,7 +52,7 @@ const user_is_connected = async (request, response, next) => {
 
 const isAdmin = async (request, response, next) => {
   const roles = request.user.roles;
-  if (roles.includes('619f8c5e274ed82841f49d6e')) {
+  if (roles.includes('637e94d2e845adc63df775a9')) {
     next();
   } else {
     const error = new Error('Vous n\'êtes pas autorisé');

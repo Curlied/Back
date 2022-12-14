@@ -1,16 +1,21 @@
-const getPage = (page = 1, size = 10) => {
-  const limit = size;
-  const offset = page * limit;
+const getPage = (req) => {
+  const {
+    page,
+    size
+  } = req.query;
+  const limit = size ? size : 10;
+  const offset = page ? page * limit : 0;
+
   return {
     limit,
     offset
   };
 };
 
-const pagination = async (modele, search, filter, page, size) => {
-  const configPage = getPage(page, size);
-  const models = await modele.find(search, filter, configPage);
-  return models;
+const pagination = async (modele, req) => {
+  const configPage = getPage(req);
+  const role = await modele.paginate(req.filter, configPage);
+  return role;
 };
 
 module.exports = pagination;

@@ -9,46 +9,40 @@ const eventExistAndNotDone = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
   const event = await eventService.findOneById(event_id);
-  if (!event || event.date_time < Date.now() || !event.is_validate) {
+  if (!event || !event.is_validate) {
     const error = new Error('Aucun évènement est répertorié');
     return errorF(error, httpStatus.NOT_FOUND, response);
   }
   next();
 };
 
-const checkIfUserIsAdminEvent = async (request, next) => {
+const ifUserIsAdminEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
-  const user_id = retrieve_user_from_token(request.cookies.access_token);
-  const UserExistOnEvent = await eventService.IsUserAdminEvent(event_id, user_id);
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const UserExistOnEvent = await eventService.IsUserAdminEvent(event_id, userId);
   request.CurrentUserIsAdmin = UserExistOnEvent;
   next();
 };
 
-const ifUserIsAdminEvent = async (request, next) => {
-  await checkIfUserIsAdminEvent(request, next);
-  next();
-};
-
-const checkIfUserParticipeOnEvent = async (request, next) => {
-  const { params } = request;
-  const { even_id } = params;
+const checkIfUserParticipeOnEvent = async (request) => {
   if (!request.CurrentUserIsAdmin) {
-    const UserExistOnEvent = await eventService.IsUserParticipeOnEvent(even_id);
+    const UserExistOnEvent = await eventService.IsUserParticipeOnEvent(request);
     request.CurrentUserHasParticipant = UserExistOnEvent;
   }
-  next();
+  return request;
 };
 
-const ifUserParticipeOnEvent = async (request, next) => {
-  await checkIfUserParticipeOnEvent(request, next);
+const ifUserParticipeOnEvent = async (request, response, next) => {
+  request = await checkIfUserParticipeOnEvent(request);
   next();
 };
 
 const userCanParticipateOnEvent = async (request, response, next) => {
   const { body } = request;
   const { event_id } = body;
-  await checkIfUserParticipeOnEvent(request, next);
+
+  request = await checkIfUserParticipeOnEvent(request);
   if (request.CurrentUserHasParticipant) {
     const error = new Error(constants.MESSAGE.ERROR_USER_EVEN_PARTICIPATION_ON_EVENT);
     return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
@@ -63,8 +57,8 @@ const userCanParticipateOnEvent = async (request, response, next) => {
 };
 
 const userCanCancelParticipationOnEvent = async (request, response, next) => {
-  await checkIfUserParticipeOnEvent(request, next);
-  if (!request.CurrentUserHasParticipant) {
+  request = await checkIfUserParticipeOnEvent(request);
+  if (request.CurrentUserHasParticipant) {
     const error = new Error(constants.MESSAGE.USER_NOT_REFENCY_ON_EVENT);
     return errorF(error, httpStatus.UNAUTHORIZED, response);
   }

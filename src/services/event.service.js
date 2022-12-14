@@ -2,7 +2,7 @@ const { Event } = require('../models');
 const constantes = require('../utils/Constantes');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 
-const create = async (user_id, event) => {
+const create = async (user_id = '', event) => {
   event.creator = user_id;
   return Event.create(event);
 };
@@ -20,8 +20,8 @@ const validate = async (event_id) => {
   return event;
 };
 
-const getAll = async (search, filter, page, size) => {
-  return await Event.find(search, filter, page, size);
+const getAll = async () => {
+  return await Event.find({ is_validate: true, date_time: { $gte: Date.now() } });
 };
 
 const getAllFiltered = async (filter = {}) => {
@@ -78,17 +78,18 @@ const cancelEvent = async (event_id) => {
 
 const IsUserAdminEvent = async (event_id, user_id) => {
   const filter = { _id: event_id, creator: user_id };
-  const event = await Event.findOne((filter));
-  return event ? true : false;
+  const event = await Event.findOne(filter);
+  if (!event) return false;
+  return true;
 };
 
 const IsUserParticipeOnEvent = async (request) => {
   const { params } = request;
   const { event_id } = params;
-
-  const { user_id } = retrieve_user_from_token(request.cookies.access_token);
-  const event = await Event.findOne({ _id: event_id, 'users.user_id': user_id });
-  return !!event;
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const event = await Event.findOne({ _id: event_id, 'users.user_id': userId });
+  if (!event) return false;
+  return true;
 };
 
 const hasPlaceToParticipeOnEvent = async (event_id) => {

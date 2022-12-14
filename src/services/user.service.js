@@ -22,7 +22,7 @@ const findOneAndUpdate = async (email_user) => {
 };
 
 const findOne = async (user_id, searchField = SearchDefaultValue) => {
-  return await User.findById(user_id).select(searchField);
+  return await User.findById({ _id: user_id }).select(searchField);
 };
 
 const findManyById = async (user_id, searchField = SearchDefaultValue) => {
@@ -36,11 +36,11 @@ const findManyUsersByUserArrayNoAsync = (_userArrayId, searchField = SearchDefau
 
 const compareAsync = (param1, param2) => {
   return new Promise(function (resolve, reject) {
-    bcrypt.compare(param1, param2, function (err, res) {
-      if (err) {
-        reject(err);
+    bcrypt.compare(param1, param2, function (error, response) {
+      if (error) {
+        reject(error);
       } else {
-        resolve(res);
+        resolve(response);
       }
     });
   });
@@ -48,10 +48,10 @@ const compareAsync = (param1, param2) => {
 
 const login = async (email, password) => {
   const user = await User.findOne({ email });
-  if (!user) return false;
+  if (!user) return { token: '', username: '' };
 
   const isCorrectPwd = await bcrypt.compare(password, user.password);
-  if (!isCorrectPwd) return false;
+  if (!isCorrectPwd) return { token: '', username: user.username };
 
   const accessToken = await jwt.sign({
     email: user.email,
@@ -60,7 +60,7 @@ const login = async (email, password) => {
   }, config.token.secret, { expiresIn: config.token.expire });
 
   const test = await compareAsync(password, user.password);
-  if (!test) return false;
+  if (!test) return { token: '', username: user.username };
   return { token: accessToken, username: user.username };
 };
 

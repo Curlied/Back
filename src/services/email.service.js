@@ -60,10 +60,8 @@ const GetTempURl = (emailUser) => {
     break;
   }
 
-  if (config.environment != 'prod') {
-    console.log(CacheKey);
-  }
   Cache.set(CacheKey, emailUser);
+  console.log(config.url_front + '/confirm?key=' + CacheKey);
   return config.url_front + '/confirm?key=' + CacheKey;
 };
 
