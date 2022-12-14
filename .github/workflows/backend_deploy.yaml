@@ -7,9 +7,20 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-      - name: Discord notification build start
+      - name: Discord notification deployed
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '> pog `${{ github.event.deployment_status.state }}`'
+          args: '> Le site à été déployé sur : `${{ github.event.deployment_status.target_url }}`'
+    if: github.event.deployment_status.state == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Discord notification deployed
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '> Le site à échoué à déployer'
