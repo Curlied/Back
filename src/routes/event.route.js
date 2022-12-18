@@ -80,11 +80,26 @@ router.get('/:_id', [isConnected, eventExistAndNotDone, ifUserIsAdminEvent, ifUs
 
 router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
 
-// should be put for update an event
-router.get('/:_id/validate', [isConnected, isAdmin], eventController.validate);
+router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'), ], eventController.create);
 
 router.post('/search', validate(eventValidation.search), eventController.search);
-router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'), ], eventController.create);
+
+
+
+/**
+ * PUT /events/{id}
+ * @summary Update an event => method only validate event
+ * @param {string} id.path.required - id mongo of event
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 200 - success response - application/json
+ * @example response - 200 - success response example
+ *  {
+ *    "message": "Event validé",
+ *    "body": true
+ *  }
+ */
+router.put('/:_id', [isConnected /*, isAdmin /* commenté à gauche pas encore d'admin*/], eventController.validate);
 
 router.put('/submit-participation', [isConnected, userCanParticipateOnEvent], eventController.submitParticipation);
 router.put('/cancel-participation', [isConnected, userCanCancelParticipationOnEvent], eventController.cancelParticipation);
