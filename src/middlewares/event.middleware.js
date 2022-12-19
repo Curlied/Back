@@ -55,7 +55,7 @@ const ifUserParticipeOnEvent = async (req, res, next) => {
 };
 
 const userCanParticipateOnEvent = async (req, res, next) => {
-  req.params._id = req.body.event_id;
+  const { _id } = req.params;
   await checkIfUserParticipeOnEvent(req, res, next);
   if (req.CurrentUserHasParticipant == true) {
     const error = new Error(constants.MESSAGE.ERROR_USER_EVEN_PARTICIPATION_ON_EVENT);

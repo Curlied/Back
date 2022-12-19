@@ -80,11 +80,22 @@ router.get('/:_id', [isConnected, eventExistAndNotDone, ifUserIsAdminEvent, ifUs
 
 router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
 
+/**
+ * POST /events
+ * @summary create an event
+ * @param {Event} request.body.required - event - application/json
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 201 - success response - application/json
+ * @example response - 201 - success response example
+ *  {
+ *    "message": "L'évènement à bien été enregistré et est en attente de validation",
+ *    "body": true
+ *  }
+ */
 router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'), ], eventController.create);
 
 router.post('/search', validate(eventValidation.search), eventController.search);
-
-
 
 /**
  * PUT /events/{id}
@@ -101,7 +112,22 @@ router.post('/search', validate(eventValidation.search), eventController.search)
  */
 router.put('/:_id', [isConnected /*, isAdmin /* commenté à gauche pas encore d'admin*/], eventController.validate);
 
-router.put('/submit-participation', [isConnected, userCanParticipateOnEvent], eventController.submitParticipation);
+/**
+ * PUT /events/{id}/join
+ * @summary Request made to the organizer to participate in the event
+ * @param {string} id.path.required - id mongo of event
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 200 - success response - application/json
+ * @example response - 200 - success response example
+ *  {
+ *    "message": "Votre demande de participation à l'évènement à bien été soumis à l'organisateur",
+ *    "body": true
+ *  }
+ */
+router.put('/:_id/join', [isConnected, userCanParticipateOnEvent], eventController.submitParticipation);
+
+//event/id/leave
 router.put('/cancel-participation', [isConnected, userCanCancelParticipationOnEvent], eventController.cancelParticipation);
 
 // should be delete without word cancel : events/id on delete action.
