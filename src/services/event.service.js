@@ -43,14 +43,14 @@ const findOneById = async (_id) => {
 const submitParticipant = async (req) => {
   var userParticipate = { user_id: req.user.userId, status: constantes.STATUS_EVENT.VALIDATE };
   return await Event.updateOne(
-    { _id: req.body.event_id },
+    { _id: req.params._id },
     { $push: { users: userParticipate } });
 };
 
 const cancelParticipant = async (req) => {
   var userParticipate = { user_id: req.user.userId };
   return await Event.updateOne(
-    { _id: req.body.event_id },
+    { _id: req.params._id  },
     { $pull: { users: userParticipate } });
 };
 

@@ -22,7 +22,7 @@ module.exports = Object.freeze({
     USER_NOT_EXIST: 'Il n\'existe pas de compte associé à cette utilisateur',
     DEMAND_PARTICIPATION_IS_OK : 'Votre demande de participation à l\'évènement à bien été soumis à l\'organisateur', 
     DEMAND_PARTICIPATION_IS_NOK : 'Une erreur est survenue pendant votre demande de participation à l\'évènement', 
-    ERROR_USER_EVEN_PARTICIPATION_ON_EVENT : 'Vous participez déjà a cette évènement', 
+    ERROR_USER_EVEN_PARTICIPATION_ON_EVENT : 'Vous participez déjà à cet évènement', 
     CANCEL_PARTICIPATION_ON_EVENT_OK : 'Votre participation à l\'évenement à été annulé',
     USER_NOT_REFENCY_ON_EVENT : 'Annulation impossible, Vous n\'êtes pas référencé dans l\'évenement',
     DISCONNECT_OK : 'Vous avez été déconnecté !',

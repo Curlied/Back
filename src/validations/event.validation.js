@@ -11,7 +11,8 @@ const create = {
     price: Joi.number().min(0).required(),
     description: Joi.string().max(255).required(),
     code: Joi.string().max(255).required(),
-    department: Joi.string().max(255).required()
+    department: Joi.string().max(255).required(),
+    url_image: Joi.array().items(Joi.string())
   })
 };
 const search = {

@@ -131,7 +131,7 @@ const cancelEvent = catchAsync(async (req, res, next) => {
     const event = await eventService.cancelEvent(req.params._id);
     if (event.date_time.getFullYear() != 0) {
       var error = new Error('Une erreur est survenue pendant l\'annulation de l\'évènement');
-      errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+      return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
     }
     successF(constants.MESSAGE.CANCEL_EVENT_OK, true, 200, res, next);
   } catch (error) {

@@ -9,6 +9,6 @@
  * @property {string} place
  * @property {number} price
  * @property {number} time
- * @property {string} url_image
+ * @property {string[]} url_image
  * @property {number} user_max
  */

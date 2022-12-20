@@ -95,6 +95,21 @@ router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
  */
 router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'), ], eventController.create);
 
+/**
+ * POST /events/search
+ * @summary Search event on post method with event params base on department, category, date or code 
+ * @param {Event} request.body.required - event - application/json
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 200 - success response - application/json
+ * @example response - 200 - success response example
+ *  {
+ *    "message": "ok",
+ *    "body": [{
+ *       "array of event"
+ *    }]
+ *  }
+ */
 router.post('/search', validate(eventValidation.search), eventController.search);
 
 /**
@@ -127,18 +142,34 @@ router.put('/:_id', [isConnected /*, isAdmin /* commenté à gauche pas encore d
  */
 router.put('/:_id/join', [isConnected, userCanParticipateOnEvent], eventController.submitParticipation);
 
-//event/id/leave
-router.put('/cancel-participation', [isConnected, userCanCancelParticipationOnEvent], eventController.cancelParticipation);
+/**
+ * PUT /events/{id}/leave
+ * @summary Request to leave participate in the event
+ * @param {string} id.path.required - id mongo of event
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 200 - success response - application/json
+ * @example response - 200 - success response example
+ *  {
+ *    "message": "Votre participation à l'évenement à été annulé",
+ *    "body": true
+ *  }
+ */
+router.put('/:_id/leave', [isConnected, userCanCancelParticipationOnEvent], eventController.cancelParticipation);
 
-// should be delete without word cancel : events/id on delete action.
-router.delete('/cancel/:_id', [isConnected, userCanCancelEvent], eventController.cancelEvent);
-
-// router.get('/:_id', validate(null), eventController.getOne);
-// router.put('/:_id', validate(eventValidation.update), eventController.update);
-
-
-
-
-
+/**
+ * DELETE /events/{id}
+ * @summary Request to delete an event, only creator event can delete event
+ * @param {string} id.path.required - id mongo of event
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 200 - success response - application/json
+ * @example response - 200 - success response example
+ *  {
+ *    "message": "L'évènement à correctement été annulé",
+ *    "body": true
+ *  }
+ */
+router.delete('/:_id', [isConnected, userCanCancelEvent], eventController.cancelEvent);
 
 module.exports = router;
