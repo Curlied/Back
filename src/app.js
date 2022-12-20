@@ -49,7 +49,20 @@ const options = {
   // You can customize your UI options.
   // you can extend swagger-ui-express config. You can checkout an example of this
   // in the `example/configuration/swaggerOptions.js`
-  swaggerUiOptions: {},
+  swaggerUiOptions: {
+    swaggerOptions: {
+      operationsSorter: (a, b) => {
+        var methodsOrder = ["get", "post", "put", "patch", "delete", "options", "trace"];
+        var result = methodsOrder.indexOf(a.get("method")) - methodsOrder.indexOf(b.get("method"));
+
+        if (result === 0) {
+          result = a.get("path").localeCompare(b.get("path"));
+        }
+
+        return result;
+      }
+    }
+  },
   // multiple option in case you want more that one instance
   multiple: true,
   servers: [

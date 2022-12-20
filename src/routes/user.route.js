@@ -39,7 +39,7 @@ router.get('/roles', [isConnected], userController.getRoles);
 
 /**
  * POST /users/register
- * @summary This is the summary of the endpoint
+ * @summary sign in an user
  * @param {User} request.body.required - users info - application/json
  * @tags users
  * @return {User} 200 - success response - application/json
@@ -67,7 +67,7 @@ router.post('/register', [validate(authValidation.register), isUniqueMail, push_
 
 /**
  * POST /users/login
- * @summary This is the summary of the endpoint
+ * @summary  login user by email and password
  * @param {Login} request.body.required - email & password - application/json
  * @tags users
  * @return {User} 200 - success response - application/json
