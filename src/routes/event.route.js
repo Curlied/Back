@@ -78,6 +78,14 @@ router.get('/', filterF(filterAllowed), eventController.getAll);
  */
 router.get('/:_id', [isConnected, eventExistAndNotDone, ifUserIsAdminEvent, ifUserParticipeOnEvent], eventController.getDetailsEvent); 
 
+/**
+ * GET /events/filtered
+ * @summary Return event filter by query params 
+ * @param {string} is_validate.query.required - search validate event or not validate - enum:false,true
+ * @security BearerAuth
+ * @tags events
+ * @return {EventDetails} 200 - success response - application/json
+ */
 router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
 
 /**
@@ -102,13 +110,6 @@ router.post('/', [isConnected, validate(eventValidation.create), push_image('eve
  * @security BearerAuth
  * @tags events
  * @return {EventDetails} 200 - success response - application/json
- * @example response - 200 - success response example
- *  {
- *    "message": "ok",
- *    "body": [{
- *       "array of event"
- *    }]
- *  }
  */
 router.post('/search', validate(eventValidation.search), eventController.search);
 

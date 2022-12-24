@@ -9,6 +9,7 @@ const successF = require('../utils/success');
 const {
   Role
 } = require('../models');
+
 const findById = catchAsync(async (req, res, next) => {
   try {
     const user = await userService.findOne(req.params);
@@ -170,10 +171,20 @@ const getRoles = catchAsync(async (req, res, next) => {
   successF('Voici mes roles', roles, 200, res, next);
 });
 
+const updateInfo = catchAsync(async (req, res, next) => {
+  try {
+    await userService.findOneAndUpdateInformations(req.user.userId, req.body);
+    successF('L\'utilisateur a été actualisé avec succès', true, 200, res, next);
+  } catch (error) {
+    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+  }
+});
+
 module.exports = {
   findById,
   myProfilDetailsUsers,
   personalInformationsDetailsUser,
   getAllEventsFromSpaceUser,
-  getRoles
+  getRoles,
+  updateInfo
 };

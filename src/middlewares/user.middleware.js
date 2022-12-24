@@ -4,6 +4,7 @@ const constants = require('../utils/Constantes');
 const errorF = require('../utils/error');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
+const { getHeaderToken } = require('../utils/jwt');
 
 const isUniqueMail = async (req, res, next) => {
   const user = await User.findOne({
@@ -36,8 +37,8 @@ const isValidate = async (req, res, next) => {
 };
 
 const isConnected = async (req, res, next) => {
-  const token = req.headers.authorization?.split('Bearer ')[1];
-  
+  const token = getHeaderToken(req);
+
   if (!token) {
     const err = new Error('Il semblerait qu\'il manque le token');
     errorF(err.message, err, httpStatus.UNAUTHORIZED, res, next);
@@ -45,7 +46,6 @@ const isConnected = async (req, res, next) => {
   else {
     jwt.verify(token, config.token.secret, (error, user) => {
       if (error) {
-        res.clearCookie('access_token'); // s'assure qu'il n'y a pas de token en mémoire coté client
         errorF('Vous n\'êtes pas connecté', error, httpStatus.UNAUTHORIZED, res, next);
       }
       if (!user) { // dans le cas où le token expire entre temps de connexion et de suppression client
@@ -58,14 +58,23 @@ const isConnected = async (req, res, next) => {
   }
 };
 
-// const isMine = (schema) => async (req, res, next) => {
-//   const userId = req.user.userId;
-
-// };
+const theRequestorIsTokenUser = async (req, res, next) => {
+  if(!req.body){
+    const error = new Error('Les paramètres sont vides');
+    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+  }
+  if (req.body.email === req.user.email) {
+    next()
+  }
+  else {
+    const error = new Error('Opération impossible veuillez vous connectez avec le bon compte');
+    return errorF(error.message, error, httpStatus.UNAUTHORIZED, res, next);
+  }
+};
 
 const isAdmin = async (req, res, next) => {
   const roles = req.user.roles;
-  if(roles.includes('619f8c5e274ed82841f49d6e')){
+  if (roles.includes('619f8c5e274ed82841f49d6e')) {
     return next();
   }
   const error = new Error('Vous n\'êtes pas autorisé');
@@ -76,5 +85,6 @@ module.exports = {
   isUniqueMail,
   isValidate,
   isConnected,
-  isAdmin
+  isAdmin,
+  theRequestorIsTokenUser
 };

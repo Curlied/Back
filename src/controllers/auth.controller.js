@@ -75,7 +75,7 @@ const confirm = catchAsync(async (req, res, next) => {
     const MagicKey = req.query.key;
     const email = Cache.get(MagicKey);
     if (email) {
-      const user = await userService.findOneAndUpdate(email);
+      const user = await userService.findOneAndConfirm(email);
 
       if (user.is_validate == true) {
         successF(constants.MESSAGE.CONFIRMATION_MAIL_SUCCESS, true, 200, res, next);
@@ -96,7 +96,6 @@ const confirm = catchAsync(async (req, res, next) => {
 
 const disconnect = catchAsync(async (req, res, next) => {
   try {
-    res.clearCookie('access_token');
     successF(constants.MESSAGE.DISCONNECT_OK, true, 200, res, next);
   }
   catch (error) {
