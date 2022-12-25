@@ -32,7 +32,7 @@ const eventExistAndNotDone = async (req, res, next) => {
     const event = await eventService.findOneById(req.params._id);
 
     if (!event || event.date_time < Date.now() || event.is_validate == false) {
-      const error = new Error('Aucun évènement est répertorié');
+      const error = new Error('Aucun évènement est répertorié ou votre évènement n`\'est pas encore validé');
       errorF(error.message, error, httpStatus.NOT_FOUND, res, next);
     }
 

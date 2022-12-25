@@ -217,7 +217,7 @@ router.put('/',[isConnected, theRequestorIsTokenUser], userController.updateInfo
 
 /**
  * PUT /users/confirm
- * @summary Update the account confirmation statut
+ * @summary Update the account confirmation statut - ⚠ need the key generate in email
  * @security BearerAuth
  * @tags users
  * @return {boolean} 200 - success response - application/json

@@ -98,7 +98,7 @@ router.post('/', [isConnected,validate(categoryValidation.create)], categoryCont
  * @return {array<Category>} 200 - success response - application/json
  * @example response - 200 - success response example
  *  {
- *    "message": "La catégorie à bien été créée",
+ *    "message": "La catégorie à bien été mise à jour",
  *    "body": {
  *      "name": "amusement",
  *      "description": "soirée kiwi à la maison",

@@ -21,7 +21,7 @@ const isUniqueMail = async (req, res, next) => {
 
 const isValidate = async (req, res, next) => {
   const user = await User.findOne({
-    email: req.body.email,
+    email: req.body?.email,
   });
 
   if (!user) {
