@@ -9,6 +9,7 @@ const fileUpload = require('express-fileupload');
 const errorF = require('./utils/error');
 const cookieParser = require('cookie-parser');
 const expressJSDocSwagger = require('express-jsdoc-swagger');
+
 const whitelist = [config.url_front];
 const corsOptions = {
   credentials: true, // This is important.
@@ -25,6 +26,8 @@ const options = {
     license: {
       name: 'MIT',
     },
+    description: 'The swagger method for curlied API.',
+    termsOfService: 'https://brikev.github.io/express-jsdoc-swagger-docs/#/',
   },
   security: {
     BearerAuth: {
@@ -68,6 +71,7 @@ const options = {
   servers: [
     {
       url: 'http://localhost:3000/api',
+      description: 'The local API server',
     }
   ]
 };
