@@ -28,7 +28,7 @@ const getAllPagination = async (req) => {
 };
 
 const getAll = async (req) => {
-  return await Event.find( { is_validate: true, date_time:  { $gte: Date.now() } });
+  return await Event.find({ is_validate: true, date_time: { $gte: Date.now() } });
 };
 
 const getAllFiltered = async (req) => {
@@ -41,17 +41,19 @@ const findOneById = async (_id) => {
 };
 
 const submitParticipant = async (req) => {
-  var userParticipate = { user_id: req.user.userId, status: constantes.STATUS_EVENT.VALIDATE };
+  var userParticipate = { user_id: req.user.userId };
   return await Event.updateOne(
     { _id: req.body.event_id },
-    { $push: { users: userParticipate } });
+    { $push: { users_waiting: userParticipate } });
 };
 
 const cancelParticipant = async (req) => {
   var userParticipate = { user_id: req.user.userId };
   return await Event.updateOne(
     { _id: req.body.event_id },
-    { $pull: { users: userParticipate } });
+    { $pull: { users_valide: userParticipate }, 
+      $pull: { users_waiting: userParticipate },  
+      $push: { users_cancel: userParticipate },});  
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -104,21 +106,21 @@ const hasPlaceToParticipeOnEvent = async (req) => {
 
 const searchEvents = async (req) => {
 
-  let filter = {is_validate:true};
+  let filter = { is_validate: true };
   req.body.department ?? 'tous';
-  if(req.body.category != 'tous') filter['category'] = req.body.category;
-  if(req.body.department != 'tous') filter['department'] = req.body.department;
-  if(req.body.code != null) filter['code'] = req.body.code;
+  if (req.body.category != 'tous') filter['category'] = req.body.category;
+  if (req.body.department != 'tous') filter['department'] = req.body.department;
+  if (req.body.code != null) filter['code'] = req.body.code;
 
-  if(req.body.date == null){
+  if (req.body.date == null) {
     filter['date_time'] = { $gte: Date.now() };
   }
-  else{
+  else {
     const dateMoinsUn = new Date(req.body.date);
     dateMoinsUn.setDate(dateMoinsUn.getDate() - 1);
     const datePlusUn = new Date(req.body.date);
     datePlusUn.setDate(datePlusUn.getDate() + 1);
-    filter['date_time'] = {$gte:  dateMoinsUn, $lt: datePlusUn };
+    filter['date_time'] = { $gte: dateMoinsUn, $lt: datePlusUn };
   }
 
   return await Event.find(filter).select('category date_time url_image name');

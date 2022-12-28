@@ -44,9 +44,17 @@ const eventModel = new mongoose.Schema({
     type: types.String,
     required: true
   },
-  users: [{
+  users_valide: [{
     user_id: types.ObjectId,
-    status: types.String
+  }],
+  users_waiting: [{
+    user_id: types.ObjectId,
+  }],
+  users_refused: [{
+    user_id: types.ObjectId,
+  }],
+  users_cancel: [{
+    user_id: types.ObjectId,
   }],
   is_validate: {
     type: types.Boolean,
