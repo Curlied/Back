@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
 const { Error } = require('mongoose');
 const constants = require('../utils/Constantes');
-// const { Event } = require('../models');
 const errorF = require('../utils/error');
 const eventService = require('../services/event.service');
 
@@ -33,7 +32,7 @@ const eventExistAndNotDone = async (req, res, next) => {
     const event = await eventService.findOneById(req.params._id);
 
     if (!event || event.date_time < Date.now() || event.is_validate == false) {
-      const error = new Error('Aucun évènement est répertorié');
+      const error = new Error('Aucun évènement est répertorié ou votre évènement n`\'est pas encore validé');
       errorF(error.message, error, httpStatus.NOT_FOUND, res, next);
     }
 
@@ -55,11 +54,10 @@ const ifUserParticipeOnEvent = async (req, res, next) => {
 };
 
 const userCanParticipateOnEvent = async (req, res, next) => {
-  req.params._id = req.body.event_id;
   await checkIfUserParticipeOnEvent(req, res, next);
   if (req.CurrentUserHasParticipant == true) {
     const error = new Error(constants.MESSAGE.ERROR_USER_EVEN_PARTICIPATION_ON_EVENT);
-    errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
   }
 
   const hasPlace = await eventService.hasPlaceToParticipeOnEvent(req);
@@ -73,7 +71,6 @@ const userCanParticipateOnEvent = async (req, res, next) => {
 };
 
 const userCanCancelParticipationOnEvent = async (req, res, next) => {
-  req.params._id = req.body.event_id;
   await checkIfUserParticipeOnEvent(req, res, next);
   if (req.CurrentUserHasParticipant == false) {
     const error = new Error(constants.MESSAGE.USER_NOT_REFENCY_ON_EVENT);

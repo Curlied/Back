@@ -62,11 +62,7 @@ const login = catchAsync(async (req, res, next) => {
       var error = new Error('L\'adresse mail ou le mot de passe est invalide');
       errorF(error.message, error, httpStatus.BAD_REQUEST, res, next);
     } else {
-      res.cookie('access_token', token, {
-        httpOnly: true,
-        secure: configs.environment === 'prod',
-      });
-      successF('La connexion à bien été effectué', data.username, 200, res, next);
+      successF('La connexion à bien été effectué', { username: data.username, token }, 200, res, next);
     }
   }
   catch (error) {
@@ -79,7 +75,7 @@ const confirm = catchAsync(async (req, res, next) => {
     const MagicKey = req.query.key;
     const email = Cache.get(MagicKey);
     if (email) {
-      const user = await userService.findOneAndUpdate(email);
+      const user = await userService.findOneAndConfirm(email);
 
       if (user.is_validate == true) {
         successF(constants.MESSAGE.CONFIRMATION_MAIL_SUCCESS, true, 200, res, next);
@@ -100,7 +96,6 @@ const confirm = catchAsync(async (req, res, next) => {
 
 const disconnect = catchAsync(async (req, res, next) => {
   try {
-    res.clearCookie('access_token');
     successF(constants.MESSAGE.DISCONNECT_OK, true, 200, res, next);
   }
   catch (error) {

@@ -2,7 +2,7 @@ const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-
+const { getHeaderToken } = require('../utils/jwt');
 const filterF = (allowed = []) => (req, res, next) => {
   const {
     filter
@@ -10,7 +10,7 @@ const filterF = (allowed = []) => (req, res, next) => {
   var isRight = true;
   var filterTrue = {};
   let isAdmin = false;
-  const token = req.cookies?.access_token;
+  const token = getHeaderToken(req);
 
   jwt.verify(token, config.token.secret, (error, user) => {
     if (user) { // dans le cas où le token expire entre temps de connexion et de suppression client

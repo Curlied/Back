@@ -43,17 +43,17 @@ const findOneById = async (_id) => {
 const submitParticipant = async (req) => {
   var userParticipate = { user_id: req.user.userId };
   return await Event.updateOne(
-    { _id: req.body.event_id },
+    { _id: req.params._id },
     { $push: { users_waiting: userParticipate } });
 };
 
 const cancelParticipant = async (req) => {
   var userParticipate = { user_id: req.user.userId };
+
+  await Event.updateMany({ _id: req.params._id }, { $pull: { users_valide: userParticipate, users_waiting: userParticipate } }, { multi: true })
   return await Event.updateOne(
-    { _id: req.body.event_id },
-    { $pull: { users_valide: userParticipate }, 
-      $pull: { users_waiting: userParticipate },  
-      $push: { users_cancel: userParticipate },});  
+    { _id: req.params._id },
+    { $push: { users_cancel: userParticipate } });
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -95,13 +95,22 @@ const IsUserAdminEvent = async (req) => {
 };
 
 const IsUserParticipeOnEvent = async (req) => {
-  const event = await Event.findOne({ _id: req.params._id, 'users.user_id': req.user.userId });
+  const event = await Event.findOne({
+    _id: req.params._id,
+    $or: [
+      { 'users_waiting.user_id': req.user.userId },
+      { 'users_valide.user_id': req.user.userId },
+      { 'users_refused.user_id': req.user.userId },
+      { 'users_cancel.user_id': req.user.userId }]
+  });
   return event ? true : false;
 };
 
 const hasPlaceToParticipeOnEvent = async (req) => {
   const event = await Event.findOne({ _id: req.params._id });
-  return event.users.length < event.user_max ? true : false;
+
+  // we check the number of user validate and waiting and we check if less than event_max
+  return event.users_waiting.length + event.users_valide.length < event.user_max ? true : false;
 };
 
 const searchEvents = async (req) => {
