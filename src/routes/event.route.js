@@ -1,5 +1,4 @@
-const express = require('express');
-const validate = require('../middlewares/validate');
+const router = require('express').Router();
 const eventController = require('../controllers/event.controller');
 const eventValidation = require('../validations/event.validation');
 const {
@@ -8,7 +7,7 @@ const {
 const filterF = require('../middlewares/filter.middleware');
 const filterAllowed = ['name'];
 const {
-  isConnected,
+  user_is_connected,
   isAdmin
 } = require('../middlewares/user.middleware');
 const {
@@ -19,21 +18,64 @@ const {
   userCanCancelEvent,
   userCanCancelParticipationOnEvent
 } = require('../middlewares/event.middleware');
-const router = express.Router();
 
-router.post('/', [isConnected, validate(eventValidation.create), push_image('event_pictures'), ], eventController.create);
-// router.put('/:_id', validate(eventValidation.update), eventController.update);
-router.get('/', filterF(filterAllowed), eventController.getAll);
-router.get('/filtered', filterF(filterAllowed), eventController.getAllFiltered);
+// import common middlewares
+const { check_params_exist, check_body_exist } = require('../middlewares/common');
+const { body_validator, params_validator } = require('../middlewares/validate');
 
-// router.get('/:_id', validate(null), eventController.getOne);
-router.get('/detailsevent/:_id', [isConnected, eventExistAndNotDone, ifUserIsAdminEvent, ifUserParticipeOnEvent], eventController.getDetailsEvent);
-router.put('/submit-participation', [isConnected, userCanParticipateOnEvent], eventController.submitParticipation);
-router.put('/cancel-participation', [isConnected, userCanCancelParticipationOnEvent], eventController.cancelParticipation);
-router.delete('/cancel/:_id', [isConnected, userCanCancelEvent], eventController.cancelEvent);
+router.post('/',
+  user_is_connected,
+  check_body_exist, body_validator(eventValidation.create),
+  push_image('event_pictures'),
+  eventController.create
+);
 
-router.get('/:_id/validate', [isConnected, isAdmin], eventController.validate);
-router.post('/search', validate(eventValidation.search), eventController.search);
+router.get('/',
+  filterF(filterAllowed),
+  eventController.getAll
+);
 
+router.get('/detailsevent/:event_id',
+  user_is_connected,
+  check_params_exist, params_validator(eventValidation.retrieve),
+  eventExistAndNotDone,
+  ifUserIsAdminEvent,
+  ifUserParticipeOnEvent,
+  eventController.getDetailsEvent
+);
+
+router.put('/submit-participation',
+  user_is_connected,
+  check_body_exist, body_validator(eventValidation.cancel_event),
+  userCanParticipateOnEvent,
+  eventController.submitParticipation
+);
+
+router.put('/cancel-participation',
+  user_is_connected,
+  check_body_exist, body_validator(eventValidation.cancel_event),
+  ifUserIsAdminEvent,
+  userCanCancelParticipationOnEvent,
+  eventController.cancelParticipation
+);
+
+router.delete('/cancel/:event_id',
+  user_is_connected,
+  check_params_exist, params_validator(eventValidation.delete_event),
+  userCanCancelEvent,
+  eventController.cancelEvent
+);
+
+router.get('/:event_id/validate',
+  user_is_connected,
+  check_params_exist, params_validator(eventValidation.delete_event),
+  isAdmin,
+  eventController.validate
+);
+
+router.post('/search',
+  check_body_exist, body_validator(eventValidation.search),
+  eventController.search
+);
 
 module.exports = router;

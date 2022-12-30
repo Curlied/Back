@@ -1,17 +1,33 @@
-const express = require('express');
-const validate = require('../middlewares/validate');
+const router = require('express').Router();
 const roleController = require('../controllers/role.controller');
 const roleValidation = require('../validations/role.validation');
 
+// import common middlewares
+const { check_body_exist, check_params_exist } = require('../middlewares/common');
+const { body_validator, params_validator } = require('../middlewares/validate');
 
-const router = express.Router();
+router.post('/',
+  check_body_exist,
+  body_validator(roleValidation.create),
+  roleController.create
+);
 
-router.post('/', validate(roleValidation.create), roleController.create);
-router.put('/:_id', validate(roleValidation.create), roleController.update);
-router.get('/:_id', validate(null), roleController.getOne);
-router.get('/', validate(null), roleController.getAll);
+router.put('/:role_id',
+  check_params_exist,
+  params_validator(roleValidation.update),
+  check_body_exist,
+  body_validator(roleValidation.update),
+  roleController.update
+);
 
+router.get('/:role_id',
+  check_params_exist,
+  params_validator(roleValidation.retrieve),
+  roleController.getOne
+);
 
-
+router.get('/',
+  roleController.getAll
+);
 
 module.exports = router;

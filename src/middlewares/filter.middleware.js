@@ -3,14 +3,14 @@ const httpStatus = require('http-status');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
-const filterF = (allowed = []) => (req, res, next) => {
+const filterF = (allowed = []) => (request, response, next) => {
   const {
     filter
-  } = req.query;
-  var isRight = true;
-  var filterTrue = {};
+  } = request.query;
+  let isRight = true;
+  let filterTrue = {};
   let isAdmin = false;
-  const token = req.cookies?.access_token;
+  const token = request.cookies?.access_token;
 
   jwt.verify(token, config.token.secret, (error, user) => {
     if (user) { // dans le cas où le token expire entre temps de connexion et de suppression client
@@ -27,12 +27,12 @@ const filterF = (allowed = []) => (req, res, next) => {
       if (splitElement.length < 2) {
         isRight = false;
         const error = new Error('Il semblerait avoir une erreur dans le filtre (manque un =)');
-        return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+        return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response, next);
       }
       if (!allowed.includes(splitElement[0]) && !isAdmin) {
         isRight = false;
         const error = new Error(`Le champs "${splitElement[0]}" n'est pas autorisé`);
-        return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+        return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response, next);
       }
       if (splitElement[0].includes('id')) {
         filterTrue[splitElement[0]] = String(splitElement[1]);
@@ -47,7 +47,7 @@ const filterF = (allowed = []) => (req, res, next) => {
 
     });
   }
-  req.filter = filterTrue;
+  request.filter = filterTrue;
   if (isRight)
     next();
 };

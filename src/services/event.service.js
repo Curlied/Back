@@ -1,18 +1,15 @@
 const { Event } = require('../models');
-const pagination = require('../utils/pagination');
 const constantes = require('../utils/Constantes');
+const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 
-const create = async (req) => {
-  req.body.creator = req.user.userId;
-  return Event.create(req.body);
+const create = async (user_id = '', event) => {
+  event.creator = user_id;
+  return Event.create(event);
 };
 
-const validate = async (req) => {
-  const {
-    _id
-  } = req.params;
+const validate = async (event_id) => {
   const event = await Event.findOneAndUpdate({
-    _id: _id
+    _id: event_id
   }, {
     $set: {
       is_validate: true
@@ -23,54 +20,47 @@ const validate = async (req) => {
   return event;
 };
 
-const getAllPagination = async (req) => {
-  return await pagination(Event, req);
+const getAll = async () => {
+  return await Event.find({ is_validate: true, date_time: { $gte: Date.now() } });
 };
 
-const getAll = async (req) => {
-  return await Event.find( { is_validate: true, date_time:  { $gte: Date.now() } });
-};
-
-const getAllFiltered = async (req) => {
-  const filter = req.filter;
-  return await Event.find(req.filter);
-};
-
-const findOneById = async (_id) => {
-  return await Event.findById(_id);
-};
-
-const submitParticipant = async (req) => {
-  var userParticipate = { user_id: req.user.userId, status: constantes.STATUS_EVENT.VALIDATE };
-  return await Event.updateOne(
-    { _id: req.body.event_id },
-    { $push: { users: userParticipate } });
-};
-
-const cancelParticipant = async (req) => {
-  var userParticipate = { user_id: req.user.userId };
-  return await Event.updateOne(
-    { _id: req.body.event_id },
-    { $pull: { users: userParticipate } });
-};
-
-// eslint-disable-next-line no-unused-vars
-const updateStatusParticipant = async (req) => {
-
-};
-
-const findAllByCreator = async (_idCreator) => {
-  const filter = { creator: _idCreator, is_validate: true };
+const getAllFiltered = async (filter = {}) => {
   return await Event.find(filter);
 };
 
-const findAllForSpaceUserByCreator = async (_idCreator) => {
-  const filter = { creator: _idCreator };
+const findOneById = async (event_id) => {
+  return await Event.findById(event_id);
+};
+
+const submitParticipant = async (user_id, event_id) => {
+  const userParticipate = { user_id: user_id, status: constantes.STATUS_EVENT.VALIDATE };
+  return await Event.updateOne(
+    { _id: event_id },
+    { $push: { users: userParticipate } });
+};
+
+const cancelParticipant = async (user_id, event_id) => {
+  const userParticipate = { user_id: user_id };
+  return await Event.updateOne(
+    { _id: event_id },
+    { $pull: { users: userParticipate } });
+};
+
+const findAllByCreator = async (creator_id) => {
+  const filter = {
+    creator: creator_id,
+    is_validate: true
+  };
+  return await Event.find(filter);
+};
+
+const findAllForSpaceUserByCreator = async (creator_id) => {
+  const filter = { creator: creator_id };
   return await Event.find(filter).select('category date_time place name url_image users user_max is_validate');
 };
 
-const findAllEventsUserParticpateIn = async (req) => {
-  return await Event.find({ 'users.user_id': req.user.userId }).select('category date_time place name url_image users user_max');
+const findAllEventsUserParticpateIn = async (user_id) => {
+  return await Event.find({ 'users.user_id': user_id }).select('category date_time place name url_image users user_max');
 };
 
 const findAllByCreatorForMyProfil = async (_idCreator) => {
@@ -78,47 +68,53 @@ const findAllByCreatorForMyProfil = async (_idCreator) => {
   return await Event.find(filter).select('category date_time place name url_image');
 };
 
-const cancelEvent = async (_idevent) => {
-  const filter = { _id: _idevent };
+const cancelEvent = async (event_id) => {
+  const filter = { _id: event_id };
   let d = new Date().setFullYear(0);
   const update = { date_time: d };
   await Event.findOneAndUpdate(filter, update);
   return await Event.findOne(filter);
 };
 
-const IsUserAdminEvent = async (req) => {
-  const filter = { _id: req.params._id, creator: req.user.userId };
-  const event = await Event.findOne((filter));
-  return event ? true : false;
+const IsUserAdminEvent = async (event_id, user_id) => {
+  const filter = { _id: event_id, creator: user_id };
+  const event = await Event.findOne(filter);
+  if (!event) return false;
+  return true;
 };
 
-const IsUserParticipeOnEvent = async (req) => {
-  const event = await Event.findOne({ _id: req.params._id, 'users.user_id': req.user.userId });
-  return event ? true : false;
+const IsUserParticipeOnEvent = async (request) => {
+  const { params } = request;
+  const { event_id } = params;
+  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const event = await Event.findOne({ _id: event_id, 'users.user_id': userId });
+  if (!event) return false;
+  return true;
 };
 
-const hasPlaceToParticipeOnEvent = async (req) => {
-  const event = await Event.findOne({ _id: req.params._id });
-  return event.users.length < event.user_max ? true : false;
+const hasPlaceToParticipeOnEvent = async (event_id) => {
+  const event = await Event.findOne({ _id: event_id });
+  return event.users.length < event.user_max;
 };
 
-const searchEvents = async (req) => {
+const searchEvents = async (request) => {
+  const { body } = request;
+  const { category, department, code, date } = body;
+  let filter = { is_validate: true };
+  department ?? 'tous';
+  if (category != 'tous') filter['category'] = category;
+  if (department != 'tous') filter['department'] = department;
+  if (code != null) filter['code'] = code;
 
-  let filter = {is_validate:true};
-  req.body.department ?? 'tous';
-  if(req.body.category != 'tous') filter['category'] = req.body.category;
-  if(req.body.department != 'tous') filter['department'] = req.body.department;
-  if(req.body.code != null) filter['code'] = req.body.code;
-
-  if(req.body.date == null){
+  if (date === null) {
     filter['date_time'] = { $gte: Date.now() };
   }
-  else{
-    const dateMoinsUn = new Date(req.body.date);
+  else {
+    const dateMoinsUn = new Date(request.body.date);
     dateMoinsUn.setDate(dateMoinsUn.getDate() - 1);
-    const datePlusUn = new Date(req.body.date);
+    const datePlusUn = new Date(request.body.date);
     datePlusUn.setDate(datePlusUn.getDate() + 1);
-    filter['date_time'] = {$gte:  dateMoinsUn, $lt: datePlusUn };
+    filter['date_time'] = { $gte: dateMoinsUn, $lt: datePlusUn };
   }
 
   return await Event.find(filter).select('category date_time url_image name');

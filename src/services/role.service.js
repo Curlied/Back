@@ -4,34 +4,28 @@ const {
   Role
 } = require('../models');
 
-const create = async (req) => {
-  return Role.create(req.body);
+const create = async (body) => {
+  return Role.create(body);
 };
 
-const update = async (req) => {
-  const {
-    _id
-  } = req.params;
+const update = async (role_id, role_body) => {
   const role = await Role.findOneAndUpdate({
-    _id: _id
-  }, req.body, {
+    _id: role_id
+  }, role_body, {
     new: true
   });
   return role;
 };
 
-const getOne = async (req) => {
-  const {
-    _id
-  } = req.params;
+const getOne = async (role_id) => {
   const role = await Role.findOne({
-    _id: _id
+    _id: role_id
   });
   return role;
 };
 
-const getAll = async (req) => {
-  return await pagination(Role, req);
+const getAll = async (search, filter, page, size) => {
+  return await pagination(Role, search, filter, page, size);
 };
 
 module.exports = {

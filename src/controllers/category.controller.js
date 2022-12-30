@@ -1,43 +1,40 @@
-const catchAsync = require('../utils/catchAsync');
+const httpStatus = require('http-status');
 const categoryService = require('../services/category.service');
-const errorF = require('../utils/error');
 const successF = require('../utils/success');
+const errorF = require('../utils/error');
 
-const create = catchAsync(async (req, res, next) => {
-  try {
-    const category = await categoryService.create(req);
-    successF('La catégorie à bien été créée', category, 200, res, next);
-  } catch (error) {
-    errorF('Une erreure est survenue lors de la création de la catégorie', error, 500, res, next);
-  }
-});
+const create = async (request, response) => {
+  const { body } = request;
+  const category_created = await categoryService.create(body);
+  return successF('created', category_created, httpStatus.CREATED, response);
+};
 
-const update = catchAsync(async (req, res, next) => {
-  try {
-    const category = await categoryService.update(req);
-    successF('La catégorie à bien été créée', category, 200, res, next);
-  } catch (error) {
-    errorF('Une erreure est survenue lors de la modification de la catégorie', error, 500, res, next);
+const update = async (request, response) => {
+  const { body, params } = request;
+  const { category_id } = params;
+  const category = await categoryService.update(category_id, body);
+  if (!category) {
+    const error = new Error('Category not found');
+    return errorF(error, httpStatus.NOT_FOUND, response);
   }
-});
+  return successF(`${category._id}`, category, httpStatus.OK, response);
+};
 
-const getOne = catchAsync(async (req, res, next) => {
-  try {
-    const category = await categoryService.getOne(req);
-    successF('OK', category, 200, res, next);
-  } catch (error) {
-    errorF(error.message, error, 500, res, next);
+const getOne = async (request, response) => {
+  const { params } = request;
+  const { category_id } = params;
+  const category = await categoryService.getOne(category_id);
+  if (!category) {
+    const error = new Error('Category not found');
+    return errorF(error, httpStatus.NOT_FOUND, response);
   }
-});
+  return successF('OK', category, httpStatus.OK, response);
+};
 
-const getAll = catchAsync(async (req, res, next) => {
-  try {
-    const categories = await categoryService.getAll(req);
-    successF('OK', categories, 200, res, next);
-  } catch (error) {
-    errorF(error.message, error, 500, res, next);
-  }
-});
+const getAll = async (request, response) => {
+  const categories = await categoryService.getAll(request) || [];
+  return successF('OK', categories, httpStatus.OK, response);
+};
 
 module.exports = {
   create,

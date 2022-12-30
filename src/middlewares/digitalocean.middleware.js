@@ -25,7 +25,6 @@ const get_image_profil = async (req, namefile) => {
   };
   let url = s3_config.getSignedUrl('getObject', params);
   req.body.profile_image = url;
-  console.log(url);
 };
 
 
@@ -37,18 +36,15 @@ const get_image_profil = async (req, namefile) => {
  * @returns
  */
 const push_image = (sub_folder) => (req, res, next) => {
-  
+
   if (!req || !req.files) {
     return next();
   }
 
   let arrayFile = Object.values(req.files);
   let arrayUrl = [];
-  // eslint-disable-next-line no-unused-vars
-  let f ;
 
   arrayFile.forEach((file) => {
-    f = file;
     const timestamp = new Date().getTime();
     const extension = path.extname(file.name);
     const fileName = path.basename(file.name, extension);
@@ -63,7 +59,7 @@ const push_image = (sub_folder) => (req, res, next) => {
       ContentType: 'image/jpeg',
     };
 
-    var putObjectPromise = s3_config.putObject(params).promise();
+    const putObjectPromise = s3_config.putObject(params).promise();
 
     putObjectPromise.catch(() => {
       const errorMessage = new Error(constants.MESSAGE.IMAGE_USER_NOT_UPLOAD);
@@ -80,9 +76,9 @@ const push_image = (sub_folder) => (req, res, next) => {
     arrayUrl.push(url);
   });
 
-  if (arrayUrl.length <= 0) {
+  if (arrayUrl.length === 0) {
     next();
-  } else if (arrayUrl.length == 1) {
+  } else if (arrayUrl.length === 1) {
     req.body.url_image = arrayUrl[0];
   } else {
     req.body.url_image = arrayUrl;
