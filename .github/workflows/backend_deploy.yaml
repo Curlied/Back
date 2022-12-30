@@ -2,7 +2,6 @@ name: Deployed on Vercel
 on:
   - deployment_status
 jobs:
-  needs: [build]
   production-deploy-succes:
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
@@ -14,8 +13,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '> The site as been deployed on : `${{
-            github.event.deployment_status.target_url }}`'
+          args: '> The site as been deployed on : `${{ github.event.deployment_status.target_url }}`'
   production-deploy-failed:
     if: github.event.deployment_status.state == 'failure'
     runs-on: ubuntu-latest
