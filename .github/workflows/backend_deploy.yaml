@@ -3,7 +3,6 @@ on:
   - deployment_status
 jobs:
   production-deploy-succes:
-    needs: [backend-build]
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
