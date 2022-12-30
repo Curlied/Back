@@ -2,6 +2,7 @@ name: Deployed on Vercel
 on:
   - deployment_status
 jobs:
+  needs: [build]
   production-deploy-succes:
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
