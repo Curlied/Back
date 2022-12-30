@@ -28,10 +28,6 @@ const validate = catchAsync(async (req, res, next) => {
 
 const getAll = catchAsync(async (req, res, next) => {
   try {
-    req.filter.is_validate = true;
-    req.filter.date_time = {
-      $gte: Date.now()
-    };
     const result = await eventService.getAll(req);
 
     let arrayEvent = result;
@@ -40,13 +36,16 @@ const getAll = catchAsync(async (req, res, next) => {
     for (let i = 0; i < arrayEvent.length; i++) {
       const category = await categoryService.FindOneById(arrayEvent[i].category);
       arrayEvent[i]._doc.categoryComplet = category;
-      arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users.length;
+      arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users_valide.length;
 
       // remove all fileds don't need
       delete arrayEvent[i]._doc.description;
       delete arrayEvent[i]._doc.price;
       delete arrayEvent[i]._doc.time;
-      delete arrayEvent[i]._doc.users;
+      delete arrayEvent[i]._doc.users_valide;
+      delete arrayEvent[i]._doc.users_waiting;
+      delete arrayEvent[i]._doc.users_refused;
+      delete arrayEvent[i]._doc.users_cancel;
       delete arrayEvent[i]._doc.is_validate;
       delete arrayEvent[i]._doc.category;
       delete arrayEvent[i]._doc.creator;
@@ -63,13 +62,16 @@ const getAllFiltered = catchAsync(async (req, res, next) => {
   for (let i = 0; i < events.length; i++) {
     const category = await categoryService.FindOneById(events[i].category);
     events[i]._doc.categoryComplet = category;
-    events[i]._doc.nbUserActual = events[i].users.length;
+    events[i]._doc.nbUserActual = events[i].users_valide.length;
 
     // remove all fileds don't need
     delete events[i]._doc.description;
     delete events[i]._doc.price;
     delete events[i]._doc.time;
-    delete events[i]._doc.users;
+    delete events[i]._doc.users_valide;
+    delete events[i]._doc.users_waiting;
+    delete events[i]._doc.users_refused;
+    delete events[i]._doc.users_cancel;
     delete events[i]._doc.is_validate;
     delete events[i]._doc.category;
     delete events[i]._doc.creator;
@@ -81,7 +83,8 @@ const getDetailsEvent = catchAsync(async (req, res, next) => {
   try {
     const event = await eventService.findOneById(req.params._id);
     const category = await categoryService.FindOneById(event.category);
-    const usersIdArray = event.users.map(w => w.user_id);  
+    const usersIdArrayValidate = event.users_valide.map(w => w.user_id);  
+    const usersIdArrayWaiting = event.users_waiting.map(w => w.user_id);  
 
     let eventObject = event?.toObject();
 
@@ -94,13 +97,16 @@ const getDetailsEvent = catchAsync(async (req, res, next) => {
       filter='username -_id'
     }
 
-    const userParticipate = await userService.findManyById(usersIdArray, filter);
+    const userParticipate = await userService.findManyById(usersIdArrayValidate, filter);
+    const userWaiting = await userService.findManyById(usersIdArrayWaiting, filter);
     const userCreator = await userService.findOne(event.creator, 'username -_id');
 
     eventObject.category = category?.toObject();
-    eventObject.users = userParticipate.map(model => model.toObject());
+    eventObject.users_valide = userParticipate.map(model => model.toObject());
+    eventObject.users_waiting = userWaiting.map(model => model.toObject());
     eventObject.creator = userCreator?.toObject();
-
+    delete eventObject.users_refused
+    delete eventObject.users_cancel
 
     successF('OK', eventObject, 200, res, next);
   } catch (error) {
