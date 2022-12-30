@@ -158,7 +158,7 @@ const getAllEventsFromSpaceUser = catchAsync(async (req, res, next) => {
       eventsParticipate: allEventParticipateInProgress,
     };
 
-    successF(constants.MESSAGE.REGISTER_SUCCES, allEvents, 200, res, next);
+    successF(constants.MESSAGE.GET_USER_EVENTS_OK, allEvents, 200, res, next);
   } catch (error) {
     errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
   }
