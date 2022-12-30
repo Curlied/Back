@@ -88,48 +88,96 @@ router.get('/infos', [isConnected], userController.personalInformationsDetailsUs
  * {
  *   "eventsCreate": [
  *     {
- *       "_id": "1R4A3BAWK0OTWX1XXMWMHVI1",
- *       "name": "bocuse",
- *       "date_time": "2023-01-01T20:07:11.382Z",
- *       "user_max": 6,
- *       "place": "43 Quai Bonaparte",
+ *       "_id": "52CL1CPNESQCPHOJCU4RI5WFR",
+ *       "date_time": "2024-05-11T06:38:26.518Z",
  *       "is_validate": true,
- *       "url_image": [
- *         "https://loremflickr.com/320/240/Abstract/any?lock=1669526051"
- *       ],
- *       "categoryInfo": {
- *         "name": "Restaurant",
- *         "url_image": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/background/bg-restaurant.jpg",
- *         "url_icon": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/svg/restaurant.svg"
- *       },
- *       "usersComplet": [
- *         {
- *           "username": "Mathilde",
- *           "status": "En attente de validation"
- *         },
- *         {
- *           "username": "test10",
- *           "status": "En attente de validation"
- *         }
- *       ]
- *     }
- *   ],
- *   "eventsParticipate": [
- *     {
- *       "_id": "1R4A3BAWK0OTWX1XXMWMHVI1",
  *       "name": "basket ball",
- *       "date_time": "2023-05-30T19:17:25.968Z",
- *       "user_max": 4,
  *       "place": "4374 Rue Molière",
  *       "url_image": [
  *         "https://loremflickr.com/320/240/Abstract/any?lock=1440899771"
  *       ],
+ *       "user_max": 4,
+ *       "users_valide": [],
+ *       "users_waiting": [
+ *         {
+ *           "_id": "52CL1CPNESQCPHOJCU4RI5WFR",
+ *           "username": "Mathilde"
+ *         },
+ *         {
+ *           "_id": "4RSDZA7IGXZSN5WN6XYT2HAJ3",
+ *           "username": "testeeur"
+ *         }
+ *       ],
+ *       "users_refused": [],
+ *       "users_cancel": [],
+ *       "categoryInfo": {
+ *         "name": "Sport",
+ *         "url_image": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/background/bg-sport.jpg",
+ *         "url_icon": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/svg/sport.svg"
+ *       }
+ *     },
+ *     {
+ *       "_id": "52CL1CPNESQCPHOJCU4RI5WFR",
+ *       "date_time": "2023-03-20T02:37:03.122Z",
+ *       "is_validate": true,
+ *       "name": "Black Panther : Wakanda Forever",
+ *       "place": "838 Quai des Grands Augustins",
+ *       "url_image": [
+ *         "https://loremflickr.com/320/240/Abstract/any?lock=86952590"
+ *       ],
+ *       "user_max": 3,
+ *       "users_valide": [
+ *         {
+ *           "_id": "52CL1CPNESQCPHOJCU4RI5WFR",
+ *           "username": "mana"
+ *         },
+ *         {
+ *           "_id": "52CL1CPNESQCPHOJCU4RI5WFR",
+ *           "username": "Sigebert"
+ *         }
+ *       ],
+ *       "users_waiting": [],
+ *       "users_refused": [],
+ *       "users_cancel": [],
+ *       "categoryInfo": {
+ *         "name": "Cinéma",
+ *         "url_image": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/background/bg-cinema.jpg",
+ *         "url_icon": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/svg/cinema.svg"
+ *       }
+ *     }
+ *   ],
+ *   "eventsParticipate": [
+ *     {
+ *       "_id": "52CL1CPNESQCPHOJCU4RI5WFR",
+ *       "date_time": "2024-05-11T06:38:26.518Z",
+ *       "name": "basket ball",
+ *       "place": "4374 Rue Molière",
+ *       "url_image": [
+ *         "https://loremflickr.com/320/240/Abstract/any?lock=1440899771"
+ *       ],
+ *       "user_max": 4,
  *       "categoryInfo": {
  *         "name": "Sport",
  *         "url_image": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/background/bg-sport.jpg",
  *         "url_icon": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/svg/sport.svg"
  *       },
- *       "statusCurrentUser": "En attente de validation"
+ *       "statusCurrentUser": "en attente"
+ *     },
+ *     {
+ *       "_id": "52CL1CPNESQCPHOJCU4RI5WFR",
+ *       "date_time": "2023-10-13T00:11:53.781Z",
+ *       "name": "enigmatic",
+ *       "place": "3 Quai des Grands Augustins",
+ *       "url_image": [
+ *         "https://loremflickr.com/320/240/Abstract/any?lock=1961749589"
+ *       ],
+ *       "user_max": 9,
+ *       "categoryInfo": {
+ *         "name": "Escape game",
+ *         "url_image": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/background/bg-escapegame.jpg",
+ *         "url_icon": "https://curlied.sfo3.digitaloceanspaces.com/curliedImages/svg/escapegame.svg"
+ *       },
+ *       "statusCurrentUser": "validé"
  *     }
  *   ]
  * }

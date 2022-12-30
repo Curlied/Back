@@ -15,7 +15,7 @@ const create = catchAsync(async (req, res, next) => {
 const update = catchAsync(async (req, res, next) => {
   try {
     const category = await categoryService.update(req);
-    successF('La catégorie à bien été créée', category, 200, res, next);
+    successF('La catégorie à bien été mise à jour', category, 200, res, next);
   } catch (error) {
     errorF('Une erreure est survenue lors de la modification de la catégorie', error, 500, res, next);
   }

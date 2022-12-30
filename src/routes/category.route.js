@@ -11,7 +11,8 @@ const router = express.Router();
 
 /**
  * GET /categories
- * @summary This is the summary of the endpoint
+ * @summary Fetch all categories exist for events
+ * @param {string} page.query - page to get result
  * @security BearerAuth
  * @tags categories
  * @return {array<Category>} 200 - success response - application/json
@@ -68,7 +69,7 @@ router.get('/:_id',[isConnected,validate(null)], categoryController.getOne);
 
 /**
  * POST /categories
- * @summary This is the summary of the endpoint
+ * @summary Create a type of categorie for event
  * @param {Category} request.body.required - category info - application/json
  * @security BearerAuth
  * @tags categories
@@ -90,7 +91,7 @@ router.post('/', [isConnected,validate(categoryValidation.create)], categoryCont
 
 /**
  * PUT /categories/{id}
- * @summary This is the summary of the endpoint
+ * @summary Update category information by id Mongo
  * @param {string} id.path.required - id mongo of category
  * @param {Category} request.body.required - category info - application/json
  * @security BearerAuth

@@ -110,23 +110,25 @@ const getAllEventsFromSpaceUser = catchAsync(async (req, res, next) => {
     for (let i = 0; i < allEventCreateInProgress.length; i++) {
       if (allEventCreateInProgress[i].is_validate == true) {
 
-        const usersIdArray = allEventCreateInProgress[i].users.map(w => w.user_id);
-        const arrayUser = await userService.findManyUsersByUserArrayNoAsync(usersIdArray, 'username');
+        const users_valideArray = allEventCreateInProgress[i].users_valide.map(w => w.user_id);
+        const users_waitingArray = allEventCreateInProgress[i].users_waiting.map(w => w.user_id);
+        const users_refusedArray = allEventCreateInProgress[i].users_refused.map(w => w.user_id);
+        const users_cancelArray = allEventCreateInProgress[i].users_cancel.map(w => w.user_id);
+        const arrayUserValide = await userService.findManyUsersByUserArrayNoAsync(users_valideArray, 'username');
+        const arrayUserWaiting = await userService.findManyUsersByUserArrayNoAsync(users_waitingArray, 'username');
+        const arrayUserRefused = await userService.findManyUsersByUserArrayNoAsync(users_refusedArray, 'username');
+        const arrayUserCancel = await userService.findManyUsersByUserArrayNoAsync(users_cancelArray, 'username');
 
+        allEventCreateInProgress[i]._doc.users_valide = arrayUserValide;
+        allEventCreateInProgress[i]._doc.users_waiting = arrayUserWaiting;
+        allEventCreateInProgress[i]._doc.users_refused = arrayUserRefused;
+        allEventCreateInProgress[i]._doc.users_cancel = arrayUserCancel;
 
-        // find a similar id between UserIdOnEvent
-        // and user
-        for (let y = 0; y < arrayUser.length; y++) {
-          let usersOnEvent = await allEventCreateInProgress[i].users;
-          const userWithStatut = usersOnEvent.find(x => x.user_id.toString() == arrayUser[y].id);
-          arrayUser[y]._doc.status = userWithStatut.status;
-          delete arrayUser[y]._doc._id;
-        }
-
-        allEventCreateInProgress[i]._doc.usersComplet = arrayUser;
-        delete allEventCreateInProgress[i]._doc.users;
       } else {
-        delete allEventCreateInProgress[i]._doc.users;
+        delete allEventCreateInProgress[i]._doc.users_valide;
+        delete allEventCreateInProgress[i]._doc.users_waiting;
+        delete allEventCreateInProgress[i]._doc.users_refused;
+        delete allEventCreateInProgress[i]._doc.users_cancel;
       }
     }
 
@@ -143,9 +145,11 @@ const getAllEventsFromSpaceUser = catchAsync(async (req, res, next) => {
         'url_icon': categorytName.url_icon,
       };
 
-      const currentUser = allEventParticipateInProgress[i].users.find(usr => usr.user_id == req.user.userId);
-      allEventParticipateInProgress[i]._doc.statusCurrentUser = currentUser._doc.status;
-      delete allEventParticipateInProgress[i]._doc.users;
+      const currentUserValidate = allEventParticipateInProgress[i].users_valide.find(usr => usr.user_id == req.user.userId);
+      const currentUserWaiting = allEventParticipateInProgress[i].users_waiting.find(usr => usr.user_id == req.user.userId);
+      allEventParticipateInProgress[i]._doc.statusCurrentUser = currentUserValidate ? "validé" : currentUserWaiting ? "en attente" : "inconnu";
+      delete allEventParticipateInProgress[i]._doc.users_valide;
+      delete allEventParticipateInProgress[i]._doc.users_waiting;
     }
 
 

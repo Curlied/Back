@@ -68,11 +68,17 @@ const findAllByCreator = async (_idCreator) => {
 
 const findAllForSpaceUserByCreator = async (_idCreator) => {
   const filter = { creator: _idCreator };
-  return await Event.find(filter).select('category date_time place name url_image users user_max is_validate');
+  return await Event.find(filter).select('category date_time place name url_image users_valide users_waiting users_refused users_cancel user_max is_validate');
 };
 
 const findAllEventsUserParticpateIn = async (req) => {
-  return await Event.find({ 'users.user_id': req.user.userId }).select('category date_time place name url_image users user_max');
+  return await Event.find(
+    { 
+    $or: [
+      { 'users_waiting.user_id': req.user.userId },
+      { 'users_valide.user_id': req.user.userId }]
+    }
+  ).select('category date_time place name url_image users_valide users_waiting user_max');
 };
 
 const findAllByCreatorForMyProfil = async (_idCreator) => {
