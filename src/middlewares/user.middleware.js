@@ -4,7 +4,7 @@ const constants = require('../utils/Constantes');
 const errorF = require('../utils/error');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
-
+const { getHeaderToken } = require('../utils/jwt');
 const isUniqueMail = async (request, response, next) => {
   const { body } = request;
   const { email } = body;
@@ -22,7 +22,7 @@ const isUniqueMail = async (request, response, next) => {
 
 const isValidate = async (req, res, next) => {
   const user = await User.findOne({
-    email: req.body.email,
+    email: req.body?.email,
   });
 
   if (!user) {
@@ -42,7 +42,7 @@ const retrieve_user_from_token = async (token) => {
 };
 
 const user_is_connected = async (request, response, next) => {
-  const token = request?.cookies?.access_token;
+  const token = getHeaderToken(request);
   if (!token) {
     const error = new Error('Il semblerait qu\'il manque le token');
     return errorF(error, httpStatus.UNAUTHORIZED, response);
@@ -60,10 +60,25 @@ const isAdmin = async (request, response, next) => {
   }
 };
 
+const theRequestorIsTokenUser = async (request, response, next) => {
+  const { body } = request;
+  if(!body){
+    const error = new Error('Les paramètres sont vides');
+    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+  }
+  if (body.email === req.user.email) {
+    next()
+  }
+  else {
+    const error = new Error('Opération impossible veuillez vous connectez avec le bon compte');
+    return errorF(error.message, error, httpStatus.UNAUTHORIZED, response);
+  }
+};
 module.exports = {
   isUniqueMail,
   isValidate,
   user_is_connected,
   isAdmin,
-  retrieve_user_from_token
+  retrieve_user_from_token,
+  theRequestorIsTokenUser
 };

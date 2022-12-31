@@ -7,6 +7,7 @@ const errorF = require('../utils/error');
 const successF = require('../utils/success');
 const { Role } = require('../models');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
+const { getHeaderToken } = require('../utils/jwt');
 
 const findById = async (request, response) => {
   const { params } = request;
@@ -21,7 +22,7 @@ const findById = async (request, response) => {
 };
 
 const myProfilDetailsUsers = async (request, response) => {
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const user = await userService.findOne(userId, 'username birth_date url_image');
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
@@ -62,7 +63,7 @@ const myProfilDetailsUsers = async (request, response) => {
 };
 
 const personalInformationsDetailsUser = async (request, response) => {
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const searchField = 'username description email birth_date telephone url_image';
   const user = await userService.findOne(userId, searchField);
 
@@ -91,7 +92,7 @@ const personalInformationsDetailsUser = async (request, response) => {
 const getAllEventsFromSpaceUser = async (request, response) => {
   /*==  EVENT USERS: ==*/
   // historique event create
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const allEventsCreate = await eventService.findAllForSpaceUserByCreator(userId);
   const allEventCreateInProgress = await allEventsCreate.filter(x => x.date_time > Date.now());
 
@@ -162,7 +163,7 @@ const getAllEventsFromSpaceUser = async (request, response) => {
 };
 
 const getRoles = async (request, response) => {
-  const { roles } = await retrieve_user_from_token(request.cookies.access_token);
+  const { roles } = await retrieve_user_from_token(getHeaderToken(request));
   let user_roles = await Promise.all(roles.map(async (roleId) => {
     const role = await Role.findOne({
       _id: roleId
@@ -177,10 +178,22 @@ const getRoles = async (request, response) => {
   );
 };
 
+const updateInfo = async(request, response) => {
+  const { user, body } = request;
+  await userService.findOneAndUpdateInformations(user.userId, body);
+  return successF(
+    'L\'utilisateur a été actualisé avec succès', 
+    true, 
+    httpStatus.OK, 
+    response
+  );
+};
+
 module.exports = {
   findById,
   myProfilDetailsUsers,
   personalInformationsDetailsUser,
   getAllEventsFromSpaceUser,
-  getRoles
+  getRoles,
+  updateInfo
 };

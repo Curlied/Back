@@ -6,10 +6,11 @@ const constants = require('../utils/Constantes');
 const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
+const { getHeaderToken } = require('../utils/jwt');
 
 const create = async (request, response) => {
   const { body: event } = request;
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const event_created = await eventService.create(userId, event);
   return successF(
     constants.MESSAGE.CONFIRMATION_EVENT_ADD,
@@ -105,9 +106,9 @@ const getDetailsEvent = async (request, response) => {
 };
 
 const submitParticipation = async (request, response) => {
-  const { body } = request;
-  const { event_id } = body;
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { params } = request;
+  const { event_id } = params;
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   await eventService.submitParticipant(userId, event_id);
   return successF(
     constants.MESSAGE.DEMAND_PARTICIPATION_IS_OK,
@@ -118,9 +119,9 @@ const submitParticipation = async (request, response) => {
 };
 
 const cancelParticipation = async (request, response) => {
-  const { body } = request;
-  const { event_id } = body;
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { params } = request;
+  const { event_id } = params;
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   await eventService.cancelParticipant(userId, event_id);
   return successF(
     constants.MESSAGE.CANCEL_PARTICIPATION_ON_EVENT_OK,
@@ -136,7 +137,7 @@ const cancelEvent = async (request, response) => {
   const event = await eventService.cancelEvent(event_id);
   if (event.date_time.getFullYear() != 0) {
     const error = new Error('Error in event anulation');
-    errorF(error, httpStatus.NOT_ACCEPTABLE, response);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
   return successF(
     constants.MESSAGE.CANCEL_EVENT_OK,

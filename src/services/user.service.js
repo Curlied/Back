@@ -9,7 +9,7 @@ const create = async (user_body) => {
   return User.create(user_body);
 };
 
-const findOneAndUpdate = async (email_user) => {
+const findOneAndConfirm = async (email_user) => {
   const filter = {
     email: email_user
   };
@@ -53,7 +53,7 @@ const login = async (email, password) => {
   const isCorrectPwd = await bcrypt.compare(password, user.password);
   if (!isCorrectPwd) return { token: '', username: user.username };
 
-  const accessToken = await jwt.sign({
+  const bearerToken = await jwt.sign({
     email: user.email,
     roles: user.roles,
     userId: user._id
@@ -61,7 +61,7 @@ const login = async (email, password) => {
 
   const test = await compareAsync(password, user.password);
   if (!test) return { token: '', username: user.username };
-  return { token: accessToken, username: user.username };
+  return { token: bearerToken, username: user.username };
 };
 
 const getAge = (birth_date) => {
@@ -76,12 +76,27 @@ const getAge = (birth_date) => {
     : year_diff - 1;
 };
 
+const findOneAndUpdateInformations = async (_id, user) => {
+  try {
+    const filter = {
+      _id: _id
+    };
+    await User.findOneAndUpdate(filter, user);
+    return true;
+  }
+  catch {
+    return false;
+  }
+
+};
+
 module.exports = {
   create,
-  findOneAndUpdate,
+  findOneAndConfirm,
   findOne,
   findManyById,
   login,
   getAge,
-  findManyUsersByUserArrayNoAsync
+  findManyUsersByUserArrayNoAsync,
+  findOneAndUpdateInformations
 };

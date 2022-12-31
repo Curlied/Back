@@ -4,13 +4,15 @@ const constants = require('../utils/Constantes');
 const errorF = require('../utils/error');
 const eventService = require('../services/event.service');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
+const { getHeaderToken } = require('../utils/jwt');
+
 
 const eventExistAndNotDone = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
   const event = await eventService.findOneById(event_id);
   if (!event || !event.is_validate) {
-    const error = new Error('Aucun évènement est répertorié');
+    const error = new Error('Aucun évènement est répertorié ou votre évènement n`\'est pas encore validé');
     return errorF(error, httpStatus.NOT_FOUND, response);
   }
   next();
@@ -19,7 +21,7 @@ const eventExistAndNotDone = async (request, response, next) => {
 const ifUserIsAdminEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const UserExistOnEvent = await eventService.IsUserAdminEvent(event_id, userId);
   request.CurrentUserIsAdmin = UserExistOnEvent;
   next();
