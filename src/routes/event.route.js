@@ -128,7 +128,7 @@ router.post('/search',
 /**
  * PUT /events/{event_id}
  * @summary Update an event => method only validate event
- * @param {string} id.path.required - id mongo of event
+ * @param {string} event_id.path.required - id mongo of event
  * @security BearerAuth
  * @tags events
  * @return {EventDetails} 200 - success response - application/json
@@ -140,13 +140,13 @@ router.post('/search',
  */
 router.put('/:event_id',
   user_is_connected,
-  check_params_exist, params_validator(eventValidation.delete_event),
+  check_params_exist, params_validator(eventValidation.retrieve),
   isAdmin,
   eventController.validate
 );
 
 /**
- * PUT /events/{event_id}/join
+ * PUT /events/join/{event_id}
  * @summary Request made to the organizer to participate in the event
  * @param {string} event_id.path.required - id mongo of event
  * @security BearerAuth
@@ -158,15 +158,15 @@ router.put('/:event_id',
  *    "body": true
  *  }
  */
-router.put('/:event_id/join',
+router.put('/join/:event_id',
   user_is_connected,
-  check_body_exist, body_validator(eventValidation.cancel_event),
+  check_params_exist, params_validator(eventValidation.retrieve),
   userCanParticipateOnEvent,
   eventController.submitParticipation
 );
 
 /**
- * PUT /events/{event_id}/leave
+ * PUT /events/leave/{event_id}
  * @summary Request to leave participate in the event
  * @param {string} event_id.path.required - id mongo of event
  * @security BearerAuth
@@ -178,9 +178,9 @@ router.put('/:event_id/join',
  *    "body": true
  *  }
  */
-router.put('/:event_id/leave',
+router.put('/leave/:event_id',
   user_is_connected,
-  check_body_exist, body_validator(eventValidation.cancel_event),
+  check_params_exist, params_validator(eventValidation.retrieve),
   ifUserIsAdminEvent,
   userCanCancelParticipationOnEvent,
   eventController.cancelParticipation

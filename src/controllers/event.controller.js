@@ -9,15 +9,24 @@ const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
 
 const create = async (request, response) => {
-  const { body: event } = request;
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
-  const event_created = await eventService.create(userId, event);
-  return successF(
-    constants.MESSAGE.CONFIRMATION_EVENT_ADD,
-    event_created,
-    httpStatus.OK,
-    response
-  );
+  try{
+    const { body: event } = request;
+    const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+    const event_created = await eventService.create(userId, event);
+    return successF(
+      constants.MESSAGE.CONFIRMATION_EVENT_ADD,
+      event_created,
+      httpStatus.OK,
+      response
+    );
+  }
+  catch (err){
+    return errorF(
+      err,
+      httpStatus.INTERNAL_SERVER_ERROR,
+      response
+    );
+  }
 };
 
 const getAll = async (_request, response) => {

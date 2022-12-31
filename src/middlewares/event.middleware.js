@@ -41,8 +41,8 @@ const ifUserParticipeOnEvent = async (request, response, next) => {
 };
 
 const userCanParticipateOnEvent = async (request, response, next) => {
-  const { body } = request;
-  const { event_id } = body;
+  const { params } = request;
+  const { event_id } = params;
 
   request = await checkIfUserParticipeOnEvent(request);
   if (request.CurrentUserHasParticipant) {
@@ -71,7 +71,8 @@ const userCanCancelEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
   const event = await eventService.findOneById(event_id);
-  if (event.creator == request.user.userId) {
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  if (event.creator == userId) {
     next();
   }
   else {

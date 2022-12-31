@@ -5,6 +5,7 @@ const errorF = require('../utils/error');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
 const { getHeaderToken } = require('../utils/jwt');
+
 const isUniqueMail = async (request, response, next) => {
   const { body } = request;
   const { email } = body;
@@ -51,7 +52,7 @@ const user_is_connected = async (request, response, next) => {
 };
 
 const isAdmin = async (request, response, next) => {
-  const roles = request.user.roles;
+  const { roles } = await retrieve_user_from_token(getHeaderToken(request));
   if (roles.includes('637e94d2e845adc63df775a9')) {
     next();
   } else {
@@ -62,11 +63,11 @@ const isAdmin = async (request, response, next) => {
 
 const theRequestorIsTokenUser = async (request, response, next) => {
   const { body } = request;
-  if(!body){
+  if (!body) {
     const error = new Error('Les paramètres sont vides');
     return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-  if (body.email === req.user.email) {
+  if (body.email === request.user.email) {
     next()
   }
   else {
