@@ -63,11 +63,12 @@ const isAdmin = async (request, response, next) => {
 
 const theRequestorIsTokenUser = async (request, response, next) => {
   const { body } = request;
+  const { email } = await retrieve_user_from_token(getHeaderToken(request));
   if (!body) {
     const error = new Error('Les paramètres sont vides');
     return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
   }
-  if (body.email === request.user.email) {
+  if (body.email === email) {
     next()
   }
   else {

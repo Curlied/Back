@@ -183,8 +183,9 @@ const getRoles = async (request, response) => {
 };
 
 const updateInfo = async (request, response) => {
-  const { user, body } = request;
-  await userService.findOneAndUpdateInformations(user.userId, body);
+  const { body } = request;
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  await userService.findOneAndUpdateInformations(userId, body);
   return successF(
     'L\'utilisateur a été actualisé avec succès',
     true,

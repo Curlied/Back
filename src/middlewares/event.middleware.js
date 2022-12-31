@@ -43,7 +43,8 @@ const ifUserParticipeOnEvent = async (request, response, next) => {
 const userCanParticipateOnEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
-  const isCreator = await eventService.IsUserAdminEvent(req);
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const isCreator = await eventService.IsUserAdminEvent(event_id, userId);
 
   if(isCreator === true){
     const error = new Error(constants.MESSAGE.ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR);
@@ -65,6 +66,15 @@ const userCanParticipateOnEvent = async (request, response, next) => {
 };
 
 const userCanCancelParticipationOnEvent = async (request, response, next) => {
+  const { params } = request;
+  const { event_id } = params;
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const isCreator = await eventService.IsUserAdminEvent(event_id, userId);
+
+  if(isCreator === true){
+    const error = new Error(constants.MESSAGE.ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR);
+    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+  }
   request = await checkIfUserParticipeOnEvent(request);
   if (request.CurrentUserHasParticipant) {
     const error = new Error(constants.MESSAGE.USER_NOT_REFENCY_ON_EVENT);

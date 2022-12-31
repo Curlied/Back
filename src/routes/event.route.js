@@ -90,8 +90,6 @@ router.get('/:event_id',
   eventController.getDetailsEvent
 );
 
-
-
 /**
  * POST /events
  * @summary create an event
@@ -181,7 +179,6 @@ router.put('/join/:event_id',
 router.put('/leave/:event_id',
   user_is_connected,
   check_params_exist, params_validator(eventValidation.retrieve),
-  ifUserIsAdminEvent,
   userCanCancelParticipationOnEvent,
   eventController.cancelParticipation
 );

@@ -42,7 +42,7 @@ const submitParticipant = async (user_id, event_id) => {
 
 const cancelParticipant = async (user_id, event_id) => {
   const userParticipate = { user_id: user_id };
-  await Event.updateMany({ _id: req.params._id }, 
+  await Event.updateMany({ _id: event_id }, 
     { $pull: { 
       users_valide: userParticipate, 
       users_waiting: userParticipate } 
@@ -51,7 +51,7 @@ const cancelParticipant = async (user_id, event_id) => {
       multi: true 
     })
   return await Event.updateOne(
-    { _id: req.params._id },
+    { _id: event_id },
     { $push: { users_cancel: userParticipate } });
 };
 
