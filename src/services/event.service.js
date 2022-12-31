@@ -1,6 +1,7 @@
 const { Event } = require('../models');
 const constantes = require('../utils/Constantes');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
+const { getHeaderToken } = require('../utils/jwt');
 
 const create = async (user_id = '', event) => {
   event.creator = user_id;
@@ -86,7 +87,7 @@ const IsUserAdminEvent = async (event_id, user_id) => {
 const IsUserParticipeOnEvent = async (request) => {
   const { params } = request;
   const { event_id } = params;
-  const { userId } = await retrieve_user_from_token(request.cookies.access_token);
+  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const event = await Event.findOne({ _id: event_id, 'users.user_id': userId });
   if (!event) return false;
   return true;

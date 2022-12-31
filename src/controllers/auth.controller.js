@@ -42,13 +42,9 @@ const login = async (request, response) => {
     const error = new Error('Invalid Credentials');
     return errorF(error, httpStatus.BAD_REQUEST, response);
   }
-  response.cookie('access_token', token, {
-    httpOnly: true,
-    secure: configs.environment === 'prod',
-  });
   return successF(
     'The connection has been done',
-    username,
+    { username, token },
     httpStatus.OK,
     response
   );
@@ -68,7 +64,7 @@ const email_confirmation = async (request, response) => {
     );
   }
 
-  const user = await userService.findOneAndUpdate(email);
+  const user = await userService.findOneAndConfirm(email);
   if (user && !user.is_validate) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_MAIL_ERROR);
     return errorF(error, httpStatus.NON_AUTHORITATIVE_INFORMATION, response);
@@ -84,7 +80,7 @@ const email_confirmation = async (request, response) => {
 };
 
 const disconnect = async (request, response) => {
-  response.clearCookie('access_token');
+
   return successF(
     constants.MESSAGE.DISCONNECT_OK,
     '',
