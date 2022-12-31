@@ -43,7 +43,13 @@ const ifUserParticipeOnEvent = async (request, response, next) => {
 const userCanParticipateOnEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
+  const isCreator = await eventService.IsUserAdminEvent(req);
 
+  if(isCreator === true){
+    const error = new Error(constants.MESSAGE.ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR);
+    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+  }
+  
   request = await checkIfUserParticipeOnEvent(request);
   if (request.CurrentUserHasParticipant) {
     const error = new Error(constants.MESSAGE.ERROR_USER_EVEN_PARTICIPATION_ON_EVENT);

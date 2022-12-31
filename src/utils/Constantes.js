@@ -29,7 +29,9 @@ module.exports = Object.freeze({
     DISCONNECT_OK: 'Vous avez été déconnecté !',
     CANCEL_EVENT_NOT_AUTHORIZE: 'Vous n\'avez pas le droit de supprimer cet évènement !',
     CANCEL_EVENT_OK: 'L\'évènement à correctement été annulé',
-    NO_PLACE_ON_EVENT: 'Il n\'y a plus de place pour participer à cet évènement'
+    NO_PLACE_ON_EVENT : 'Il n\'y a plus de place pour participer à cet évènement',
+    GET_USER_EVENTS_OK : "Voici les évènements que vous avez créé et auquels vous participez",
+    ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR : "Vous ne pouvez pas participer à cet évènement car vous êtes le créateur de cet évènement",
   },
   EMAIL_REPLACE: {
     PSEUDO: '%%pseudo%%',

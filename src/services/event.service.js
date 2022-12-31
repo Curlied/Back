@@ -37,14 +37,22 @@ const submitParticipant = async (user_id, event_id) => {
   const userParticipate = { user_id: user_id, status: constantes.STATUS_EVENT.VALIDATE };
   return await Event.updateOne(
     { _id: event_id },
-    { $push: { users: userParticipate } });
+    { $push: { users_waiting: userParticipate } });
 };
 
 const cancelParticipant = async (user_id, event_id) => {
   const userParticipate = { user_id: user_id };
+  await Event.updateMany({ _id: req.params._id }, 
+    { $pull: { 
+      users_valide: userParticipate, 
+      users_waiting: userParticipate } 
+    }, 
+    { 
+      multi: true 
+    })
   return await Event.updateOne(
-    { _id: event_id },
-    { $pull: { users: userParticipate } });
+    { _id: req.params._id },
+    { $push: { users_cancel: userParticipate } });
 };
 
 const findAllByCreator = async (creator_id) => {
@@ -57,11 +65,17 @@ const findAllByCreator = async (creator_id) => {
 
 const findAllForSpaceUserByCreator = async (creator_id) => {
   const filter = { creator: creator_id };
-  return await Event.find(filter).select('category date_time place name url_image users user_max is_validate');
+  return await Event.find(filter).select('category date_time place name url_image users_valide users_waiting users_refused users_cancel user_max is_validate');
 };
 
 const findAllEventsUserParticpateIn = async (user_id) => {
-  return await Event.find({ 'users.user_id': user_id }).select('category date_time place name url_image users user_max');
+  return await Event.find(
+    { 
+    $or: [
+      { 'users_waiting.user_id': user_id },
+      { 'users_valide.user_id': user_id }]
+    }
+  ).select('category date_time place name url_image users_valide users_waiting user_max');
 };
 
 const findAllByCreatorForMyProfil = async (_idCreator) => {
@@ -88,14 +102,23 @@ const IsUserParticipeOnEvent = async (request) => {
   const { params } = request;
   const { event_id } = params;
   const { userId } = await retrieve_user_from_token(getHeaderToken(request));
-  const event = await Event.findOne({ _id: event_id, 'users.user_id': userId });
+  const event = await Event.findOne({
+    _id: event_id,
+    $or: [
+      { 'users_waiting.user_id': userId },
+      { 'users_valide.user_id': userId },
+      { 'users_refused.user_id': userId },
+      { 'users_cancel.user_id': userId }]
+  });
+
   if (!event) return false;
   return true;
 };
 
 const hasPlaceToParticipeOnEvent = async (event_id) => {
   const event = await Event.findOne({ _id: event_id });
-  return event.users.length < event.user_max;
+  // we check the number of user validate and waiting and we check if less than event_max
+  return event.users_waiting.length + event.users_valide.length < event.user_max ? true : false;
 };
 
 const searchEvents = async (request) => {
