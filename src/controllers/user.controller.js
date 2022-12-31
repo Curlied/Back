@@ -146,8 +146,8 @@ const getAllEventsFromSpaceUser = async (request, response) => {
       'url_icon': categorytName.url_icon,
     };
 
-    const currentUserValidate = allEventParticipateInProgress[i].users_valide.find(usr => usr.user_id == req.user.userId);
-    const currentUserWaiting = allEventParticipateInProgress[i].users_waiting.find(usr => usr.user_id == req.user.userId);
+    const currentUserValidate = allEventParticipateInProgress[i].users_valide.find(usr => usr.user_id == userId);
+    const currentUserWaiting = allEventParticipateInProgress[i].users_waiting.find(usr => usr.user_id == userId);
     allEventParticipateInProgress[i]._doc.statusCurrentUser = currentUserValidate ? "validé" : currentUserWaiting ? "en attente" : "inconnu";
     delete allEventParticipateInProgress[i]._doc.users_valide;
     delete allEventParticipateInProgress[i]._doc.users_waiting;
