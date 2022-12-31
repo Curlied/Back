@@ -9,7 +9,7 @@ const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
 
 const create = async (request, response) => {
-  try{
+  try {
     const { body: event } = request;
     const { userId } = await retrieve_user_from_token(getHeaderToken(request));
     const event_created = await eventService.create(userId, event);
@@ -20,7 +20,7 @@ const create = async (request, response) => {
       response
     );
   }
-  catch (err){
+  catch (err) {
     return errorF(
       err,
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -38,13 +38,16 @@ const getAll = async (_request, response) => {
   for (let i = 0; i < arrayEvent.length; i++) {
     const category = await categoryService.FindOneById(arrayEvent[i].category);
     arrayEvent[i]._doc.categoryComplet = category;
-    arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users.length;
+    arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users_valide.length;
 
     // remove all fileds don't need
     delete arrayEvent[i]._doc.description;
     delete arrayEvent[i]._doc.price;
     delete arrayEvent[i]._doc.time;
-    delete arrayEvent[i]._doc.users;
+    delete arrayEvent[i]._doc.users_valide;
+    delete arrayEvent[i]._doc.users_waiting;
+    delete arrayEvent[i]._doc.users_refused;
+    delete arrayEvent[i]._doc.users_cancel;
     delete arrayEvent[i]._doc.is_validate;
     delete arrayEvent[i]._doc.category;
     delete arrayEvent[i]._doc.creator;
@@ -63,13 +66,16 @@ const getAllFiltered = async (request, response) => {
   for (let i = 0; i < events.length; i++) {
     const category = await categoryService.FindOneById(events[i].category);
     events[i]._doc.categoryComplet = category;
-    events[i]._doc.nbUserActual = events[i].users.length;
+    events[i]._doc.nbUserActual = events[i].users_valide.length;
 
     // remove all fileds don't need
     delete events[i]._doc.description;
     delete events[i]._doc.price;
     delete events[i]._doc.time;
-    delete events[i]._doc.users;
+    delete events[i]._doc.users_valide;
+    delete events[i]._doc.users_waiting;
+    delete events[i]._doc.users_refused;
+    delete events[i]._doc.users_cancel;
     delete events[i]._doc.is_validate;
     delete events[i]._doc.category;
     delete events[i]._doc.creator;
@@ -87,8 +93,8 @@ const getDetailsEvent = async (request, response) => {
   const { event_id } = params;
   const event = await eventService.findOneById(event_id);
   const category = await categoryService.FindOneById(event.category);
-  const usersIdArray = event.users.map(w => w.user_id);
-
+  const usersIdArrayValidate = event.users_valide.map(w => w.user_id);
+  const usersIdArrayWaiting = event.users_waiting.map(w => w.user_id);
   let eventObject = event?.toObject();
 
   let filter;
@@ -100,12 +106,16 @@ const getDetailsEvent = async (request, response) => {
     filter = 'username -_id';
   }
 
-  const userParticipate = await userService.findManyById(usersIdArray, filter);
+  const userParticipate = await userService.findManyById(usersIdArrayValidate, filter);
+  const userWaiting = await userService.findManyById(usersIdArrayWaiting, filter);
   const userCreator = await userService.findOne(event.creator, 'username -_id');
 
   eventObject.category = category?.toObject();
-  eventObject.users = userParticipate.map(model => model.toObject());
+  eventObject.users_valide = userParticipate.map(model => model.toObject());
+  eventObject.users_waiting = userWaiting.map(model => model.toObject());
   eventObject.creator = userCreator?.toObject();
+  delete eventObject.users_refused
+  delete eventObject.users_cancel
   return successF(
     'OK',
     eventObject,
