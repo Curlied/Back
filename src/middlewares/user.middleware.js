@@ -21,18 +21,18 @@ const isUniqueMail = async (request, response, next) => {
   }
 };
 
-const isValidate = async (req, res, next) => {
+const isValidate = async (request, response, next) => {
   const user = await User.findOne({
-    email: req.body?.email,
+    email: request.body?.email,
   });
 
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
-    return errorF(error, httpStatus.UNAUTHORIZED, res);
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
   else if (!user.is_validate) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_NOT_MADE);
-    return errorF(error, httpStatus.UNAUTHORIZED, res);
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   } else {
     next();
   }
@@ -66,14 +66,14 @@ const theRequestorIsTokenUser = async (request, response, next) => {
   const { email } = await retrieve_user_from_token(getHeaderToken(request));
   if (!body) {
     const error = new Error('Les paramètres sont vides');
-    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
   if (body.email === email) {
-    next()
+    next();
   }
   else {
     const error = new Error('Opération impossible veuillez vous connectez avec le bon compte');
-    return errorF(error.message, error, httpStatus.UNAUTHORIZED, response);
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
 };
 module.exports = {

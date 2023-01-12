@@ -46,11 +46,11 @@ const userCanParticipateOnEvent = async (request, response, next) => {
   const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const isCreator = await eventService.IsUserAdminEvent(event_id, userId);
 
-  if(isCreator === true){
+  if (isCreator === true) {
     const error = new Error(constants.MESSAGE.ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR);
-    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response, next);
   }
-  
+
   request = await checkIfUserParticipeOnEvent(request);
   if (request.CurrentUserHasParticipant) {
     const error = new Error(constants.MESSAGE.ERROR_USER_EVEN_PARTICIPATION_ON_EVENT);
@@ -71,9 +71,9 @@ const userCanCancelParticipationOnEvent = async (request, response, next) => {
   const { userId } = await retrieve_user_from_token(getHeaderToken(request));
   const isCreator = await eventService.IsUserAdminEvent(event_id, userId);
 
-  if(isCreator === true){
+  if (isCreator === true) {
     const error = new Error(constants.MESSAGE.ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR);
-    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, res, next);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
   request = await checkIfUserParticipeOnEvent(request);
   if (request.CurrentUserHasParticipant) {

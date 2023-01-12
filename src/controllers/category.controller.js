@@ -5,7 +5,10 @@ const errorF = require('../utils/error');
 
 const create = async (request, response) => {
   const { body } = request;
-  const category_created = await categoryService.create(body);
+  const { category: category_created, error } = await categoryService.create(body);
+  if (error) {
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
   return successF('created', category_created, httpStatus.CREATED, response);
 };
 

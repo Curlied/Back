@@ -6,7 +6,6 @@ const { Cache, ReplaceUserNameAndUrl } = require('../services/email.service');
 const httpStatus = require('http-status');
 const errorF = require('../utils/error');
 const successF = require('../utils/success');
-const configs = require('../config/index');
 
 const register = async (request, response) => {
   const { body } = request;

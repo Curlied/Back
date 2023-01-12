@@ -42,13 +42,15 @@ const submitParticipant = async (user_id, event_id) => {
 
 const cancelParticipant = async (user_id, event_id) => {
   const userParticipate = { user_id: user_id };
-  await Event.updateMany({ _id: event_id }, 
-    { $pull: { 
-      users_valide: userParticipate, 
-      users_waiting: userParticipate } 
-    }, 
-    { 
-      multi: true 
+  await Event.updateMany({ _id: event_id },
+    {
+      $pull: {
+        users_valide: userParticipate,
+        users_waiting: userParticipate
+      }
+    },
+    {
+      multi: true
     })
   return await Event.updateOne(
     { _id: event_id },
@@ -70,10 +72,10 @@ const findAllForSpaceUserByCreator = async (creator_id) => {
 
 const findAllEventsUserParticpateIn = async (user_id) => {
   return await Event.find(
-    { 
-    $or: [
-      { 'users_waiting.user_id': user_id },
-      { 'users_valide.user_id': user_id }]
+    {
+      $or: [
+        { 'users_waiting.user_id': user_id },
+        { 'users_valide.user_id': user_id }]
     }
   ).select('category date_time place name url_image users_valide users_waiting user_max');
 };

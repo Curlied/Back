@@ -40,9 +40,9 @@ const myProfilDetailsUsers = async (request, response) => {
     const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
     delete allEventCreateInProgress[i]._doc.category;
     allEventCreateInProgress[i]._doc.categoryInfo = {
-      'name': categorytName.name,
-      'url_image': categorytName.url_image,
-      'url_icon': categorytName.url_icon,
+      'name': categorytName?.name,
+      'url_image': categorytName?.url_image,
+      'url_icon': categorytName?.url_icon,
     };
   }
 
@@ -101,9 +101,9 @@ const getAllEventsFromSpaceUser = async (request, response) => {
     const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
     delete allEventCreateInProgress[i]._doc.category;
     allEventCreateInProgress[i]._doc.categoryInfo = {
-      'name': categorytName.name,
-      'url_image': categorytName.url_image,
-      'url_icon': categorytName.url_icon,
+      'name': categorytName?.name,
+      'url_image': categorytName?.url_image,
+      'url_icon': categorytName?.url_icon,
     };
   }
 
@@ -172,7 +172,7 @@ const getRoles = async (request, response) => {
     const role = await Role.findOne({
       _id: roleId
     });
-    return role.name;
+    return role?.name;
   }));
   return successF(
     'Here my roles',
