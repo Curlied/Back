@@ -1,11 +1,11 @@
 const responses = require('../models/responses');
 
-const success = (message, body, code, res, next) => {
-  res.status(code);
-  res.json(
+const success = (message, body, code, response) => {
+  response.status(code);
+  response.json(
     new responses(message, body)
   );
-  return next(res);
+  return response;
 };
 
 module.exports = success;

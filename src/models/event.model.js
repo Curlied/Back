@@ -4,8 +4,6 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 const types = mongoose.Schema.Types;
 
-
-
 const eventModel = new mongoose.Schema({
   creator: {
     type: types.ObjectId,
@@ -44,9 +42,21 @@ const eventModel = new mongoose.Schema({
     type: types.String,
     required: true
   },
-  users: [{
+  users_valide: [{
     user_id: types.ObjectId,
-    status: types.String
+    _id: false
+  }],
+  users_waiting: [{
+    user_id: types.ObjectId,
+    _id: false
+  }],
+  users_refused: [{
+    user_id: types.ObjectId,
+    _id: false
+  }],
+  users_cancel: [{
+    user_id: types.ObjectId,
+    _id: false
   }],
   is_validate: {
     type: types.Boolean,
@@ -58,11 +68,11 @@ const eventModel = new mongoose.Schema({
   },
   code: {
     type: types.String,
-    required : true
+    required: true
   },
   department: {
     type: types.String,
-    required : true
+    required: true
   },
   url_image: [String]
 });

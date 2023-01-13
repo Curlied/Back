@@ -56,3 +56,7 @@ fabric.properties
 # *.ipr 
 
 .idea/*
+.vercel
+.vscode
+build/
+dist/

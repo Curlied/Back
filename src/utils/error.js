@@ -1,18 +1,11 @@
-const responses = require('../models/responses');
-const config = require('../config/index');
+const Responses = require('../models/responses');
 
-const error = (message, error, code, res, next) => {
-  res.status(code);
-  if (config.environment == 'prod') {
-    res.json(
-      new responses(message, {})
-    );
-  } else {
-    res.json(
-      new responses(message, `${error}`)
-    );
-  }
-  return next(res);
+const error = (error, code, response) => {
+  response.status(code);
+  response.json(
+    new Responses(error.message, error)
+  );
+  return response;
 };
 
 module.exports = error;

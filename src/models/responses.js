@@ -1,6 +1,6 @@
 module.exports = class Responses {
-  constructor(message, objet) {
+  constructor(message, response) {
     this.message = message;
-    this.body = objet;
+    this.body = response;
   }
 };

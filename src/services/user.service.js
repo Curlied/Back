@@ -4,14 +4,12 @@ const config = require('../config');
 const jwt = require('jsonwebtoken');
 const SearchDefaultValue = 'username email';
 
-
-
-const create = async (userBody) => {
-  userBody.password = bcrypt.hashSync(userBody.password, 10);
-  return User.create(userBody);
+const create = async (user_body) => {
+  user_body.password = bcrypt.hashSync(user_body.password, 10);
+  return User.create(user_body);
 };
 
-const findOneAndUpdate = async (email_user) => {
+const findOneAndConfirm = async (email_user) => {
   const filter = {
     email: email_user
   };
@@ -23,12 +21,12 @@ const findOneAndUpdate = async (email_user) => {
   return user;
 };
 
-const findOne = async (_id, searchField = SearchDefaultValue) => {
-  return await User.findById(_id).select(searchField);
+const findOne = async (user_id, searchField = SearchDefaultValue) => {
+  return await User.findById({ _id: user_id }).select(searchField);
 };
 
-const findManyById = async (_userid, searchField = SearchDefaultValue) => {
-  return await User.find({ '_id': { $in: _userid } }).select(searchField);
+const findManyById = async (user_id, searchField = SearchDefaultValue) => {
+  return await User.find({ '_id': { $in: user_id } }).select(searchField);
 };
 
 const findManyUsersByUserArrayNoAsync = (_userArrayId, searchField = SearchDefaultValue) => {
@@ -38,72 +36,67 @@ const findManyUsersByUserArrayNoAsync = (_userArrayId, searchField = SearchDefau
 
 const compareAsync = (param1, param2) => {
   return new Promise(function (resolve, reject) {
-    bcrypt.compare(param1, param2, function (err, res) {
-      if (err) {
-        reject(err);
+    bcrypt.compare(param1, param2, function (error, response) {
+      if (error) {
+        reject(error);
       } else {
-        resolve(res);
+        resolve(response);
       }
     });
   });
 };
 
-const login = async (req) => {
-  const {
-    email,
-    password
-  } = req.body;
+const login = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user) return { token: '', username: '' };
 
-  const user = await User.findOne({
-    email: email
+  const isCorrectPwd = await bcrypt.compare(password, user.password);
+  if (!isCorrectPwd) return { token: '', username: user.username };
 
-  });
-
-  
-
-  if (!user) {
-    return 'Invalid Credentiel';
-
-  }
-  const isCorrectPwd =await bcrypt.compare(req.body.password,user.password);
-  if(isCorrectPwd == false){
-    
-    return 'email or password incorrect';
-  }
-
-  const accessToken = await jwt.sign({
+  const bearerToken = await jwt.sign({
     email: user.email,
     roles: user.roles,
     userId: user._id
   }, config.token.secret, { expiresIn: config.token.expire });
 
   const test = await compareAsync(password, user.password);
-  if (test) {
-    return { 'token': accessToken, 'username': user.username };
-  } else {
-    return 'Invalid Credentiel';
-  }
+  if (!test) return { token: '', username: user.username };
+  return { token: bearerToken, username: user.username };
 };
 
 const getAge = (birth_date) => {
-  var now = new Date();
-  var current_year = now.getFullYear();
-  var year_diff = current_year - birth_date.getFullYear();
-  var birthday_this_year = new Date(current_year, birth_date.getMonth(), birth_date.getDate());
-  var has_had_birthday_this_year = (now >= birthday_this_year);
+  const now = new Date();
+  const current_year = now.getFullYear();
+  const year_diff = current_year - birth_date.getFullYear();
+  const birthday_this_year = new Date(current_year, birth_date.getMonth(), birth_date.getDate());
+  const has_had_birthday_this_year = (now >= birthday_this_year);
 
   return has_had_birthday_this_year
     ? year_diff
     : year_diff - 1;
 };
 
+const findOneAndUpdateInformations = async (_id, user) => {
+  try {
+    const filter = {
+      _id: _id
+    };
+    await User.findOneAndUpdate(filter, user);
+    return true;
+  }
+  catch {
+    return false;
+  }
+
+};
 
 module.exports = {
   create,
-  findOneAndUpdate,
+  findOneAndConfirm,
   findOne,
   findManyById,
   login,
   getAge,
-  findManyUsersByUserArrayNoAsync
+  findManyUsersByUserArrayNoAsync,
+  findOneAndUpdateInformations
 };

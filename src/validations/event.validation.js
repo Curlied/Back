@@ -1,4 +1,4 @@
-const Joi = require('Joi').extend(require('@joi/date'));
+const Joi = require('joi').extend(require('@joi/date'));
 
 const create = {
   body: Joi.object().keys({
@@ -11,9 +11,11 @@ const create = {
     price: Joi.number().min(0).required(),
     description: Joi.string().max(255).required(),
     code: Joi.string().max(255).required(),
-    department: Joi.string().max(255).required()
+    department: Joi.string().max(255).required(),
+    url_image: Joi.array().items(Joi.string())
   })
 };
+
 const search = {
   body: Joi.object().keys({
     category: Joi.string().required(),
@@ -21,10 +23,41 @@ const search = {
     code: Joi.string().allow(null),
     date: Joi.date().format('YYYY-MM-DD').utc().allow(null),
     numdepartment: Joi.string().required()
+  }),
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const retrieve = {
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const delete_event = {
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const cancel_event = {
+  body: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
+  })
+};
+
+const submit_event = {
+  body: Joi.object().keys({
+    event_id: Joi.string().min(24).required()
   })
 };
 
 module.exports = {
   create,
-  search
+  search,
+  retrieve,
+  cancel_event,
+  submit_event,
+  delete_event,
 };

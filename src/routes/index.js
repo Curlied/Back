@@ -1,10 +1,9 @@
-const express = require('express');
-const authRoute = require('./user.route');
+const router = require('express').Router();
+const authRoute = require('./authentication.route');
 const roleRoute = require('./role.route');
 const eventRoute = require('./event.route');
 const categoryRoute = require('./category.route');
 const userRoute = require('./user.route');
-const router = express.Router();
 
 const defaultRoutes = [
   {

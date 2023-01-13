@@ -48,24 +48,20 @@ const sendHtmlEmail = async (to, subject, html) => {
 const GetTempURl = (emailUser) => {
   // let CacheKey =
   //   crypto.randomBytes(16).toString('base64') + new Date().getTime();
-  let CacheKey ;
+  let CacheKey;
 
   // be sure you don't have a same magic key in memory
   // eslint-disable-next-line no-constant-condition
-  while(true)
-  {
+  while (true) {
     CacheKey = constants.uuid().trim().trimStart().trimEnd();
-    if(Cache.has(CacheKey) == true)
-    {
+    if (Cache.has(CacheKey) == true) {
       continue;
     }
     break;
   }
 
-  if (config.environment != 'prod') {
-    console.log(CacheKey);
-  }
   Cache.set(CacheKey, emailUser);
+  console.log(config.url_front + '/confirm?key=' + CacheKey);
   return config.url_front + '/confirm?key=' + CacheKey;
 };
 
