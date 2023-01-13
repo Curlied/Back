@@ -5,6 +5,7 @@ const errorF = require('../utils/error');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
 const { getHeaderToken } = require('../utils/jwt');
+const error = require('../utils/error');
 
 const isUniqueMail = async (request, response, next) => {
   const { body } = request;
@@ -21,38 +22,43 @@ const isUniqueMail = async (request, response, next) => {
   }
 };
 
-const isValidate = async (req, res, next) => {
+const isValidate = async (request, response, next) => {
   const user = await User.findOne({
-    email: req.body?.email,
+    email: request.body?.email,
   });
 
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
-    return errorF(error, httpStatus.UNAUTHORIZED, res);
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
   else if (!user.is_validate) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_NOT_MADE);
-    return errorF(error, httpStatus.UNAUTHORIZED, res);
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   } else {
     next();
   }
 };
 
 const retrieve_user_from_token = async (token) => {
-  return await jwt.verify(token, config.token.secret);
+  try {
+    const token_decoded = await jwt.verify(token, config.token.secret);
+    return { error: undefined, token: token_decoded };
+  } catch (err) {
+    return { error: err.message, token: undefined };
+  };
 };
 
 const user_is_connected = async (request, response, next) => {
-  const token = getHeaderToken(request);
-  if (!token) {
-    const error = new Error('Il semblerait qu\'il manque le token');
+  const { error: error_message } = await retrieve_user_from_token(getHeaderToken(request));
+  if (error_message) {
+    const error = new Error(error_message);
     return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
   next();
 };
 
 const isAdmin = async (request, response, next) => {
-  const { roles } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { roles } } = await retrieve_user_from_token(getHeaderToken(request));
   if (roles.includes('637e94d2e845adc63df775a9')) {
     next();
   } else {
@@ -63,17 +69,17 @@ const isAdmin = async (request, response, next) => {
 
 const theRequestorIsTokenUser = async (request, response, next) => {
   const { body } = request;
-  const { email } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { email } } = await retrieve_user_from_token(getHeaderToken(request));
   if (!body) {
     const error = new Error('Les paramètres sont vides');
-    return errorF(error.message, error, httpStatus.NOT_ACCEPTABLE, response);
+    return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
   if (body.email === email) {
-    next()
+    next();
   }
   else {
     const error = new Error('Opération impossible veuillez vous connectez avec le bon compte');
-    return errorF(error.message, error, httpStatus.UNAUTHORIZED, response);
+    return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
 };
 module.exports = {

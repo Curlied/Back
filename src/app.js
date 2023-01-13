@@ -107,9 +107,9 @@ app.get('/', (req, res) => {
 });
 
 // Handle syntax error
-app.use((error, req, res, next) => {
+app.use((error, request, response, next) => {
   if (error instanceof SyntaxError) {
-    errorF(error.message, error, 500, res, next);
+    errorF(error, httpStatus.INTERNAL_SERVER_ERROR, response);
   } else {
     next();
   }
@@ -122,9 +122,9 @@ if (config.environment == 'local') {
 app.use('/api', routes);
 
 // Error handling not found
-app.use((req, res, next) => {
-  const error = new Error(`🔍 - Not Found - ${req.originalUrl}`);
-  errorF(error.message, error, httpStatus.NOT_FOUND, res, next);
+app.use((request, response) => {
+  const error = new Error(`🔍 - Not Found - ${request.originalUrl}`);
+  errorF(error, httpStatus.NOT_FOUND, response);
 });
 
 module.exports = app;

@@ -22,7 +22,7 @@ const findById = async (request, response) => {
 };
 
 const myProfilDetailsUsers = async (request, response) => {
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const user = await userService.findOne(userId, 'username birth_date url_image');
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
@@ -40,9 +40,9 @@ const myProfilDetailsUsers = async (request, response) => {
     const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
     delete allEventCreateInProgress[i]._doc.category;
     allEventCreateInProgress[i]._doc.categoryInfo = {
-      'name': categorytName.name,
-      'url_image': categorytName.url_image,
-      'url_icon': categorytName.url_icon,
+      'name': categorytName?.name,
+      'url_image': categorytName?.url_image,
+      'url_icon': categorytName?.url_icon,
     };
   }
 
@@ -63,7 +63,7 @@ const myProfilDetailsUsers = async (request, response) => {
 };
 
 const personalInformationsDetailsUser = async (request, response) => {
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const searchField = 'username description email birth_date telephone url_image';
   const user = await userService.findOne(userId, searchField);
 
@@ -92,7 +92,7 @@ const personalInformationsDetailsUser = async (request, response) => {
 const getAllEventsFromSpaceUser = async (request, response) => {
   /*==  EVENT USERS: ==*/
   // historique event create
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const allEventsCreate = await eventService.findAllForSpaceUserByCreator(userId);
   const allEventCreateInProgress = await allEventsCreate.filter(x => x.date_time > Date.now());
 
@@ -101,9 +101,9 @@ const getAllEventsFromSpaceUser = async (request, response) => {
     const categorytName = await categoryService.FindOneById(allEventCreateInProgress[i].category);
     delete allEventCreateInProgress[i]._doc.category;
     allEventCreateInProgress[i]._doc.categoryInfo = {
-      'name': categorytName.name,
-      'url_image': categorytName.url_image,
-      'url_icon': categorytName.url_icon,
+      'name': categorytName?.name,
+      'url_image': categorytName?.url_image,
+      'url_icon': categorytName?.url_icon,
     };
   }
 
@@ -167,12 +167,12 @@ const getAllEventsFromSpaceUser = async (request, response) => {
 };
 
 const getRoles = async (request, response) => {
-  const { roles } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { roles } } = await retrieve_user_from_token(getHeaderToken(request));
   let user_roles = await Promise.all(roles.map(async (roleId) => {
     const role = await Role.findOne({
       _id: roleId
     });
-    return role.name;
+    return role?.name;
   }));
   return successF(
     'Here my roles',
@@ -184,7 +184,7 @@ const getRoles = async (request, response) => {
 
 const updateInfo = async (request, response) => {
   const { body } = request;
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   await userService.findOneAndUpdateInformations(userId, body);
   return successF(
     'L\'utilisateur a été actualisé avec succès',

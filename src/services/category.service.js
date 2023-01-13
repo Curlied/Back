@@ -2,7 +2,16 @@ const { Category } = require('../models');
 const pagination = require('../utils/pagination');
 
 const create = async (body) => {
-  return Category.create(body);
+  const category_exist = await Category.findOne({
+    name: body?.name
+  });
+  if (category_exist) {
+    return {
+      category: category_exist, error: new Error('Category name exist already')
+    };
+  }
+  const category = Category.create(body);
+  return { category: category, error: null };
 };
 
 const getAll = async (search, filter, page, size) => {
