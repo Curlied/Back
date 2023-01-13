@@ -2,8 +2,10 @@ const { Event } = require('../models');
 const constantes = require('../utils/Constantes');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
+const { convertDateStringToDate } = require('../utils/Constantes');
 
 const create = async (user_id = '', event) => {
+  event.date_time = convertDateStringToDate(event.date_time);
   event.creator = user_id;
   return Event.create(event);
 };

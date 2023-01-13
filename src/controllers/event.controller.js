@@ -7,7 +7,6 @@ const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
-
 const create = async (request, response) => {
   try {
     const { body: event } = request;
