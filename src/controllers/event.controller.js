@@ -40,7 +40,6 @@ const getAll = async (_request, response) => {
     arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users_valide.length;
 
     // remove all fileds don't need
-    delete arrayEvent[i]._doc.description;
     delete arrayEvent[i]._doc.price;
     delete arrayEvent[i]._doc.time;
     delete arrayEvent[i]._doc.users_valide;
@@ -68,7 +67,6 @@ const getAllFiltered = async (request, response) => {
     events[i]._doc.nbUserActual = events[i].users_valide.length;
 
     // remove all fileds don't need
-    delete events[i]._doc.description;
     delete events[i]._doc.price;
     delete events[i]._doc.time;
     delete events[i]._doc.users_valide;
