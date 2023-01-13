@@ -7,11 +7,10 @@ const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
-
 const create = async (request, response) => {
   try {
     const { body: event } = request;
-    const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+    const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
     const event_created = await eventService.create(userId, event);
     return successF(
       constants.MESSAGE.CONFIRMATION_EVENT_ADD,
@@ -127,7 +126,7 @@ const getDetailsEvent = async (request, response) => {
 const submitParticipation = async (request, response) => {
   const { params } = request;
   const { event_id } = params;
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   await eventService.submitParticipant(userId, event_id);
   return successF(
     constants.MESSAGE.DEMAND_PARTICIPATION_IS_OK,
@@ -140,7 +139,7 @@ const submitParticipation = async (request, response) => {
 const cancelParticipation = async (request, response) => {
   const { params } = request;
   const { event_id } = params;
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   await eventService.cancelParticipant(userId, event_id);
   return successF(
     constants.MESSAGE.CANCEL_PARTICIPATION_ON_EVENT_OK,

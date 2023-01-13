@@ -21,29 +21,29 @@ const eventExistAndNotDone = async (request, response, next) => {
 const ifUserIsAdminEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const UserExistOnEvent = await eventService.IsUserAdminEvent(event_id, userId);
   request.CurrentUserIsAdmin = UserExistOnEvent;
   next();
 };
 
-const checkIfUserParticipeOnEvent = async (request) => {
+const checkIfUserParticipeOnEvent = async (request, response) => {
   if (!request.CurrentUserIsAdmin) {
-    const UserExistOnEvent = await eventService.IsUserParticipeOnEvent(request);
+    const UserExistOnEvent = await eventService.IsUserParticipeOnEvent(request, response);
     request.CurrentUserHasParticipant = UserExistOnEvent;
   }
   return request;
 };
 
 const ifUserParticipeOnEvent = async (request, response, next) => {
-  request = await checkIfUserParticipeOnEvent(request);
+  request = await checkIfUserParticipeOnEvent(request, response);
   next();
 };
 
 const userCanParticipateOnEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const isCreator = await eventService.IsUserAdminEvent(event_id, userId);
 
   if (isCreator === true) {
@@ -68,7 +68,7 @@ const userCanParticipateOnEvent = async (request, response, next) => {
 const userCanCancelParticipationOnEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const isCreator = await eventService.IsUserAdminEvent(event_id, userId);
 
   if (isCreator === true) {
@@ -87,7 +87,7 @@ const userCanCancelEvent = async (request, response, next) => {
   const { params } = request;
   const { event_id } = params;
   const event = await eventService.findOneById(event_id);
-  const { userId } = await retrieve_user_from_token(getHeaderToken(request));
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   if (event.creator == userId) {
     next();
   }

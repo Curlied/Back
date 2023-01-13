@@ -1,6 +1,5 @@
 {
   "name": "spaces-node-app",
-  "version": "1.0.0",
   "dependencies": {
     "@joi/date": "^2.1.0",
     "aws-sdk": "^2.1034.0",
@@ -23,8 +22,7 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "build": "./node_modules/.bin/netlify-lambda build src"
+    "start": "node src/index.js"
   },
   "devDependencies": {
     "eslint": "^8.4.1",

@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 const uuid = () => {
   return 'xxxxxxxx-4xxx-yxxx'.replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0,
@@ -5,6 +7,10 @@ const uuid = () => {
     return v.toString(16);
   });
 };
+
+const convertDateStringToDate = (date_string) =>{
+  return moment(date_string, 'DD/MM/YYYY HH:mm').add(1,'hours');
+}
 
 module.exports = Object.freeze({
   MESSAGE: {
@@ -47,4 +53,5 @@ module.exports = Object.freeze({
     REFUSE: 'Refusé',
   },
   uuid,
+  convertDateStringToDate
 });
