@@ -14,10 +14,9 @@ const whitelist = [config.url_front];
 const corsOptions = {
   credentials: true, // This is important.
   origin: (origin, callback) => {
-    if (whitelist.includes(origin))
-      return callback(null, true);
+    if (whitelist.includes(origin)) return callback(null, true);
     callback(new Error('Not allowed by CORS'));
-  }
+  },
 };
 const options = {
   info: {
@@ -34,7 +33,7 @@ const options = {
       type: 'http',
       scheme: 'bearer',
       bearerFormat: 'JWT',
-    }
+    },
   },
   baseDir: __dirname,
   // Glob pattern to find your jsdoc files (multiple patterns can be added in an array)
@@ -55,16 +54,26 @@ const options = {
   swaggerUiOptions: {
     swaggerOptions: {
       operationsSorter: (a, b) => {
-        var methodsOrder = ["get", "post", "put", "patch", "delete", "options", "trace"];
-        var result = methodsOrder.indexOf(a.get("method")) - methodsOrder.indexOf(b.get("method"));
+        var methodsOrder = [
+          'get',
+          'post',
+          'put',
+          'patch',
+          'delete',
+          'options',
+          'trace',
+        ];
+        var result =
+          methodsOrder.indexOf(a.get('method')) -
+          methodsOrder.indexOf(b.get('method'));
 
         if (result === 0) {
-          result = a.get("path").localeCompare(b.get("path"));
+          result = a.get('path').localeCompare(b.get('path'));
         }
 
         return result;
-      }
-    }
+      },
+    },
   },
   // multiple option in case you want more that one instance
   multiple: true,
@@ -72,8 +81,8 @@ const options = {
     {
       url: 'http://localhost:3000/api',
       description: 'The local API server',
-    }
-  ]
+    },
+  ],
 };
 
 const app = express();
@@ -106,7 +115,9 @@ app.use((error, req, res, next) => {
   }
 });
 
-expressJSDocSwagger(app)(options);
+if (config.environment == 'local') {
+  expressJSDocSwagger(app)(options);
+}
 // All the api routes
 app.use('/api', routes);
 
