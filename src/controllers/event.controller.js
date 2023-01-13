@@ -7,13 +7,10 @@ const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
-const moment = require('moment');
-
 const create = async (request, response) => {
   try {
     const { body: event } = request;
     const { userId } = await retrieve_user_from_token(getHeaderToken(request));
-    event.date_time = moment(event.date_time, 'DD/MM/YYYY HH:mm');
     const event_created = await eventService.create(userId, event);
     return successF(
       constants.MESSAGE.CONFIRMATION_EVENT_ADD,
