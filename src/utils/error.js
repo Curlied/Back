@@ -3,7 +3,7 @@ const Responses = require('../models/responses');
 const error = (error, code, response) => {
   response.status(code);
   response.json(
-    new Responses('Error', error.message)
+    new Responses(error.message, error)
   );
   return response;
 };

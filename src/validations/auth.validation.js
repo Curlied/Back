@@ -11,7 +11,7 @@ const register = {
     email: Joi.string().email().required(),
     birth_date: Joi.date().raw().required(),
     confirm_password: Joi.string().valid(Joi.ref('password')).required(),
-    telephone: Joi.string().regex(/(^[0-9]+$)/),
+    telephone: Joi.string().regex(/(^[0-9]+$)/).required(),
     url_image: Joi.any(),
   }),
   query: Joi.object({
