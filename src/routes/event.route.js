@@ -113,7 +113,7 @@ router.post('/',
 /**
  * POST /events/search
  * @summary Search event on post method with event params base on department, category, date or code 
- * @param {Event} request.body.required - event - application/json
+ * @param {EventSearch} request.body.required - event - application/json
  * @security BearerAuth
  * @tags events
  * @return {EventDetails} 200 - success response - application/json
