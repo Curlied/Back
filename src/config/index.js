@@ -29,8 +29,8 @@ module.exports = {
     time_update: 600,
   },
   Aws: {
-    id: process.env.AWS_ACCESS_KEY_ID,
-    key: process.env.AWS_SECRET_ACCESS_KEY,
+    id: process.env.AWS_ACCESS_KEY_ID_MINE,
+    key: process.env.AWS_SECRET_ACCESS_KEY_MINE,
     bucket: process.env.AWS_BUCKET_NAME,
     endpoint: process.env.ENDPOINT,
     folder: process.env.FOLDER_IMAGE,
