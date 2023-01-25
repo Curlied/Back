@@ -8,6 +8,7 @@ const successF = require('../utils/success');
 const { Role } = require('../models');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
+const bcrypt = require('bcryptjs');
 
 const findById = async (request, response) => {
   const { params } = request;
@@ -215,7 +216,26 @@ const updateUserEmail = async (request, response) => {
   );
 };
 
+const updateUserPassword = async (request, response) => {
+  const { body } = request;
 
+  // on reinitialise la validation
+  body.password = bcrypt.hashSync(body.password, 10);
+  body.is_validate = false;
+
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
+  const changed = await userService.findOneAndUpdateInformations(userId, body);
+  if (!changed) {
+    const error = new Error(constants.MESSAGE.PASSWORD_CHANGE_ERROR);
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
+  return successF(
+    constants.MESSAGE.PASSWORD_CHANGE_SUCCESSFUL,
+    true,
+    httpStatus.OK,
+    response
+  );
+};
 
 module.exports = {
   findById,
@@ -225,4 +245,5 @@ module.exports = {
   getRoles,
   updateInfo,
   updateUserEmail,
+  updateUserPassword,
 };

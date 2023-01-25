@@ -95,15 +95,15 @@ const check_email_changes = async (request, response, next) => {
   }
 };
 
-const check_user_exist = async (request, response, next) => {
+const check_user_id = async (request, response, next) => {
   const { params } = request;
-  const { user_id } = params;
-  if (!isValid(user_id)) {
+  const { userId } = params;
+  if (!isValid(userId)) {
     const error = new Error(constants.MESSAGE.OBJECTID_NOT_VALID);
     return errorF(error, httpStatus.BAD_REQUEST, response);
   }
   const user = await User.findOne({
-    _id: user_id,
+    _id: userId,
   });
   if (!user) {
     const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
@@ -120,5 +120,5 @@ module.exports = {
   retrieve_user_from_token,
   theRequestorIsTokenUser,
   check_email_changes,
-  check_user_exist
+  check_user_id
 };

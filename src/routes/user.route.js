@@ -3,11 +3,12 @@ const userController = require('../controllers/user.controller');
 const { check_body_exist, check_params_exist } = require('../middlewares/common');
 
 // import common middlewares
-const { user_is_connected, theRequestorIsTokenUser, check_email_changes, check_user_exist } = require('../middlewares/user.middleware');
+const { user_is_connected, theRequestorIsTokenUser, check_email_changes, check_user_id } = require('../middlewares/user.middleware');
 const { body_validator, params_validator } = require('../middlewares/validate');
 
 // import validation email
 const { body_email, userId } = require('../validations/email.validation');
+const { userUpdate, bodyPassword } = require('../validations/user.validation')
 
 
 /**
@@ -160,7 +161,7 @@ router.get('/roles',
 /**
  * PUT /users
  * @summary Update user information
- * @param {User-infos} request.body.required - users info - application/json
+ * @param {User-update} request.body.required - users info - application/json
  * @security BearerAuth
  * @tags users
  * @return {boolean} 200 - success response - application/json
@@ -172,14 +173,14 @@ router.get('/roles',
  */
 router.put('/',
   user_is_connected,
-  theRequestorIsTokenUser,
+  theRequestorIsTokenUser, body_validator(userUpdate),
   userController.updateInfo
 );
 
 /**
  * PUT /users/{user_id}/email
  * @summary Update user's email address
- * @param {User-infos} request.body.required - users info - application/json
+ * @param {User-email} request.body.required - users info - application/json
  * @security BearerAuth
  * @tags users
  * @return {boolean} 200 - success response - application/json
@@ -193,9 +194,32 @@ router.put('/:userId/email',
   user_is_connected,
   check_params_exist, params_validator(userId),
   check_body_exist,
-  check_user_exist,
-  check_email_changes, body_validator(body_email),
+  check_user_id,
+  body_validator(body_email),
+  check_email_changes,
   userController.updateUserEmail
+);
+
+/**
+ * PUT /users/{user_id}/password
+ * @summary Update user's password
+ * @param {User-password} request.body.required - users info - application/json
+ * @security BearerAuth
+ * @tags users
+ * @return {boolean} 200 - success response - application/json
+ * @example response - 200 - success response example
+ *  {
+ *    "message": "Le password de l'utilisateur a été actualisé avec succès",
+ *    "body": true
+ *  }
+ */
+router.put('/:userId/password',
+  user_is_connected,
+  check_params_exist, params_validator(userId),
+  check_body_exist,
+  check_user_id,
+  body_validator(bodyPassword),
+  userController.updateUserPassword
 );
 
 module.exports = router;

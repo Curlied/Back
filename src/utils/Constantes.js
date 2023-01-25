@@ -40,8 +40,10 @@ module.exports = Object.freeze({
     ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR: 'Vous ne pouvez pas participer à cet évènement car vous êtes le créateur de cet évènement',
     OBJECTID_NOT_VALID: 'L\'id de l\'utilisateur n\'est pas valide',
     EMAIL_CONFLIT: 'L\'email est le même de votre compte actuel',
-    EMAIL_CHANGE_ERROR: 'L\'email de l\'utilisateur n\'a pas été actualisé avec succès',
-    EMAIL_CHANGE_SUCCESSFUL: 'L\'email de l\'utilisateur a été actualisé avec succès'
+    EMAIL_CHANGE_ERROR: 'Error dans l\'actualisation du email',
+    EMAIL_CHANGE_SUCCESSFUL: 'L\'email de l\'utilisateur a été actualisé avec succès',
+    PASSWORD_CHANGE_ERROR: 'Error dans l\'actualisation du password',
+    PASSWORD_CHANGE_SUCCESSFUL: 'Le password de l\'utilisateur a été actualisé avec succès'
   },
   EMAIL_REPLACE: {
     PSEUDO: '%%pseudo%%',
