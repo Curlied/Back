@@ -14,8 +14,11 @@ const whitelist = [config.url_front];
 const corsOptions = {
   credentials: true, // This is important.
   origin: (origin, callback) => {
-    if (whitelist.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
+    if (whitelist.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
 };
 const options = {
@@ -106,13 +109,15 @@ app.get('/', (req, res) => {
   });
 });
 
-// Handle syntax error
+// Handle CORS error
 app.use((error, request, response, next) => {
   if (error instanceof SyntaxError) {
-    errorF(error, httpStatus.INTERNAL_SERVER_ERROR, response);
-  } else {
-    next();
+    return errorF(error, httpStatus.INTERNAL_SERVER_ERROR, response);
   }
+  if (error instanceof Error) {
+    return errorF(error, httpStatus.FORBIDDEN, response);
+  }
+  next();
 });
 
 if (config.environment == 'local') {
