@@ -194,11 +194,35 @@ const updateInfo = async (request, response) => {
   );
 };
 
+
+const updateUserEmail = async (request, response) => {
+  const { body } = request;
+
+  // on reinitialise la validation
+  body.is_validate = false;
+
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
+  const changed = await userService.findOneAndUpdateInformations(userId, body);
+  if (!changed) {
+    const error = new Error(constants.MESSAGE.EMAIL_CHANGE_ERROR);
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
+  return successF(
+    constants.MESSAGE.EMAIL_CHANGE_SUCCESSFUL,
+    true,
+    httpStatus.OK,
+    response
+  );
+};
+
+
+
 module.exports = {
   findById,
   myProfilDetailsUsers,
   personalInformationsDetailsUser,
   getAllEventsFromSpaceUser,
   getRoles,
-  updateInfo
+  updateInfo,
+  updateUserEmail,
 };
