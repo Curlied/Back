@@ -53,6 +53,13 @@ const submit_event = {
   })
 };
 
+const accept_user = {
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required(),
+    user_id: Joi.string().min(24).required(),
+  })
+};
+
 module.exports = {
   create,
   search,
@@ -60,4 +67,5 @@ module.exports = {
   cancel_event,
   submit_event,
   delete_event,
+  accept_user,
 };

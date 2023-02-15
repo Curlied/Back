@@ -3,6 +3,8 @@ const constantes = require('../utils/Constantes');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
 const { convertDateStringToDate } = require('../utils/Constantes');
+const { Types } = require('mongoose')
+
 
 const create = async (user_id = '', event) => {
   event.date_time = convertDateStringToDate(event.date_time);
@@ -40,6 +42,18 @@ const submitParticipant = async (user_id, event_id) => {
   return await Event.updateOne(
     { _id: event_id },
     { $push: { users_waiting: userParticipate } });
+};
+
+const confirmParticipant = async (user_id, event_id) => {
+  const userParticipate = { user_id: Types.ObjectId(user_id) };
+  return await Event.updateOne(
+    { _id: event_id },
+    {
+      $push: { users_valide: userParticipate },
+      $pull: { users_waiting: userParticipate },
+    }, {
+    multi: true
+  });
 };
 
 const cancelParticipant = async (user_id, event_id) => {
@@ -164,5 +178,6 @@ module.exports = {
   IsUserParticipeOnEvent,
   hasPlaceToParticipeOnEvent,
   searchEvents,
-  getAllFiltered
+  getAllFiltered,
+  confirmParticipant,
 };

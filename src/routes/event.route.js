@@ -143,6 +143,12 @@ router.put('/:event_id',
   eventController.validate
 );
 
+router.put('/:event_id/users/:user_id/confirm',
+  user_is_connected,
+  check_params_exist, params_validator(eventValidation.accept_user),
+  eventController.confirmUserOnEvent
+);
+
 /**
  * PUT /events/join/{event_id}
  * @summary Request made to the organizer to participate in the event

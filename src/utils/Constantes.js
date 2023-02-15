@@ -43,7 +43,9 @@ module.exports = Object.freeze({
     EMAIL_CHANGE_ERROR: 'Error dans l\'actualisation du email',
     EMAIL_CHANGE_SUCCESSFUL: 'L\'email de l\'utilisateur a été actualisé avec succès',
     PASSWORD_CHANGE_ERROR: 'Error dans l\'actualisation du password',
-    PASSWORD_CHANGE_SUCCESSFUL: 'Le password de l\'utilisateur a été actualisé avec succès'
+    PASSWORD_CHANGE_SUCCESSFUL: 'Le password de l\'utilisateur a été actualisé avec succès',
+    USER_ACCEPTED_TO_EVENT: 'user accepté à l\'eventement',
+    USER_NOT_IN_WAITING_LIST: 'User n\'est pas dans la liste d\'attente de l\'event'
   },
   EMAIL_REPLACE: {
     PSEUDO: '%%pseudo%%',
