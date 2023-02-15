@@ -61,7 +61,7 @@ const GetTempURl = (emailUser) => {
   }
 
   Cache.set(CacheKey, emailUser);
-  return config.url_front + '/api/auth/confirm?key=' + CacheKey;
+  return config.url_front + '/confirm?key=' + CacheKey;
 };
 
 const ReplaceUserNameAndUrl = async (stringHtmlMail, username, urlTempory) => {

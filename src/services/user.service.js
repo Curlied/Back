@@ -76,13 +76,13 @@ const getAge = (birth_date) => {
     : year_diff - 1;
 };
 
-const findOneAndUpdateInformations = async (_id, user) => {
+const findOneAndUpdateInformations = async (id, user) => {
   try {
     const filter = {
-      _id: _id
+      _id: id
     };
-    await User.findOneAndUpdate(filter, user);
-    return true;
+    const _user = await User.findOneAndUpdate(filter, user);
+    return _user;
   }
   catch {
     return false;

@@ -1,5 +1,7 @@
+const fs = require('fs');
 const userService = require('../services/user.service');
 const eventService = require('../services/event.service');
+const emailService = require('../services/email.service');
 const categoryService = require('../services/category.service');
 const constants = require('../utils/Constantes');
 const httpStatus = require('http-status');
@@ -8,6 +10,8 @@ const successF = require('../utils/success');
 const { Role } = require('../models');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
+const bcrypt = require('bcryptjs');
+const { Cache, ReplaceUserNameAndUrl } = require('../services/email.service');
 
 const findById = async (request, response) => {
   const { params } = request;
@@ -194,11 +198,84 @@ const updateInfo = async (request, response) => {
   );
 };
 
+
+const updateUserEmail = async (request, response) => {
+  const { body } = request;
+  // on reinitialise la validation
+  body.is_validate = false;
+
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
+  const userChanged = await userService.findOneAndUpdateInformations(userId, body);
+  if (!userChanged) {
+    const error = new Error(constants.MESSAGE.EMAIL_CHANGE_ERROR);
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
+  const urlTemp = emailService.GetTempURl(body.email);
+  let emailHtml = fs
+    .readFileSync(constants.EMAIL_TEMPLATE.PATH_CONFIRMATION_INSCRIPTION)
+    .toString();
+
+  emailHtml = await ReplaceUserNameAndUrl(
+    emailHtml,
+    userChanged.username,
+    urlTemp
+  );
+  emailService.sendHtmlEmail(
+    body.email,
+    'Confirmation changement email',
+    emailHtml
+  );
+  return successF(
+    constants.MESSAGE.EMAIL_CHANGE_SUCCESSFUL,
+    true,
+    httpStatus.OK,
+    response
+  );
+};
+
+const updateUserPassword = async (request, response) => {
+  const { body } = request;
+
+  // on reinitialise la validation
+  body.password = bcrypt.hashSync(body.password, 10);
+  body.is_validate = false;
+
+  const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
+  const userChanged = await userService.findOneAndUpdateInformations(userId, body);
+  if (!userChanged) {
+    const error = new Error(constants.MESSAGE.PASSWORD_CHANGE_ERROR);
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
+  const urlTemp = emailService.GetTempURl(userChanged.email);
+  let emailHtml = fs
+    .readFileSync(constants.EMAIL_TEMPLATE.PATH_CONFIRMATION_INSCRIPTION)
+    .toString();
+
+  emailHtml = await ReplaceUserNameAndUrl(
+    emailHtml,
+    userChanged.username,
+    urlTemp
+  );
+  emailService.sendHtmlEmail(
+    userChanged.email,
+    'Confirmation changement du password',
+    emailHtml
+  );
+  return successF(
+    constants.MESSAGE.PASSWORD_CHANGE_SUCCESSFUL,
+    true,
+    httpStatus.OK,
+    response
+  );
+};
+
 module.exports = {
   findById,
   myProfilDetailsUsers,
   personalInformationsDetailsUser,
   getAllEventsFromSpaceUser,
   getRoles,
-  updateInfo
+  updateInfo,
+  updateUserEmail,
+  updateUserPassword,
 };

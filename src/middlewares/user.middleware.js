@@ -5,7 +5,7 @@ const errorF = require('../utils/error');
 const config = require('../config');
 const jwt = require('jsonwebtoken');
 const { getHeaderToken } = require('../utils/jwt');
-const error = require('../utils/error');
+const { isValid } = require('mongoose').Types.ObjectId;
 
 const isUniqueMail = async (request, response, next) => {
   const { body } = request;
@@ -45,7 +45,7 @@ const retrieve_user_from_token = async (token) => {
     return { error: undefined, token: token_decoded };
   } catch (err) {
     return { error: err.message, token: undefined };
-  };
+  }
 };
 
 const user_is_connected = async (request, response, next) => {
@@ -82,11 +82,43 @@ const theRequestorIsTokenUser = async (request, response, next) => {
     return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
 };
+
+
+const check_email_changes = async (request, response, next) => {
+  const { body } = request;
+  const { token: { email } } = await retrieve_user_from_token(getHeaderToken(request));
+  if (body?.email !== email) {
+    next();
+  } else {
+    const error = new Error(constants.MESSAGE.EMAIL_CONFLIT);
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
+};
+
+const check_user_id = async (request, response, next) => {
+  const { params } = request;
+  const { userId } = params;
+  if (!isValid(userId)) {
+    const error = new Error(constants.MESSAGE.OBJECTID_NOT_VALID);
+    return errorF(error, httpStatus.BAD_REQUEST, response);
+  }
+  const user = await User.findOne({
+    _id: userId,
+  });
+  if (!user) {
+    const error = new Error(constants.MESSAGE.USER_NOT_EXIST);
+    return errorF(error, httpStatus.BAD_REQUEST, response);
+  }
+  next();
+};
+
 module.exports = {
   isUniqueMail,
   isValidate,
   user_is_connected,
   isAdmin,
   retrieve_user_from_token,
-  theRequestorIsTokenUser
+  theRequestorIsTokenUser,
+  check_email_changes,
+  check_user_id
 };
