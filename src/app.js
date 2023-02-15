@@ -10,14 +10,14 @@ const errorF = require('./utils/error');
 const cookieParser = require('cookie-parser');
 const expressJSDocSwagger = require('express-jsdoc-swagger');
 
-const whitelist = [config.url_front];
-const corsOptions = {
-  credentials: true, // This is important.
-  origin: (origin, callback) => {
-    if (whitelist.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  },
-};
+// const whitelist = [config.url_front];
+// const corsOptions = {
+//   credentials: true, // This is important.
+//   origin: (origin, callback) => {
+//     if (whitelist.includes(origin)) return callback(null, true);
+//     callback(new Error('Not allowed by CORS'));
+//   },
+// };
 const options = {
   info: {
     version: '1.0.0',
@@ -90,7 +90,7 @@ app.use(cookieParser());
 
 app.set('trust proxy', 1);
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(morgan('tiny'));
 app.use(helmet());
 app.use(express.json());
@@ -109,6 +109,8 @@ app.get('/', (req, res) => {
 // Handle syntax error
 app.use((error, request, response, next) => {
   if (error instanceof SyntaxError) {
+    errorF(error, httpStatus.INTERNAL_SERVER_ERROR, response);
+  } else if (error instanceof Error) {
     errorF(error, httpStatus.INTERNAL_SERVER_ERROR, response);
   } else {
     next();
