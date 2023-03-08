@@ -141,17 +141,14 @@ const hasPlaceToParticipeOnEvent = async (event_id) => {
 
 const searchEvents = async (request) => {
   const { body } = request;
-  const { category, department, code, date } = body;
+  const { category, department, date } = body;
   let filter = { is_validate: true };
   department ?? 'tous';
   if (category != 'tous') filter['category'] = category;
   if (department != 'tous') filter['department'] = department;
-  if (code != null) filter['code'] = code;
-
   if (date === null) {
     filter['date_time'] = { $gte: Date.now() };
-  }
-  else {
+  } else {
     const dateMoinsUn = new Date(request.body.date);
     dateMoinsUn.setDate(dateMoinsUn.getDate() - 1);
     const datePlusUn = new Date(request.body.date);
