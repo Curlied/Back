@@ -61,7 +61,6 @@ const GetTempURl = (emailUser) => {
   }
 
   Cache.set(CacheKey, emailUser);
-  console.log(config.url_front + '/confirm?key=' + CacheKey);
   return config.url_front + '/confirm?key=' + CacheKey;
 };
 

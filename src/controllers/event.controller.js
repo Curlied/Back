@@ -7,6 +7,9 @@ const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
+const { Types } = require('mongoose');
+const { MESSAGE } = require('../utils/Constantes');
+
 const create = async (request, response) => {
   try {
     const { body: event } = request;
@@ -198,6 +201,23 @@ const validate = async (request, response) => {
   );
 };
 
+const confirmUserOnEvent = async (request, response) => {
+  const { params: { event_id, user_id } } = request;
+  const event = await eventService.findOneById(event_id);
+  const user_wainting = event.users_waiting.some(user => new Types.ObjectId(user_id).equals(user.user_id))
+  if (!user_wainting) {
+    const error = new Error(MESSAGE.USER_NOT_IN_WAITING_LIST)
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
+  await eventService.confirmParticipant(user_id, event_id)
+  return successF(
+    `${MESSAGE.USER_ACCEPTED_TO_EVENT} ${event.name}`,
+    true,
+    httpStatus.OK,
+    response
+  );
+};
+
 module.exports = {
   create,
   getAll,
@@ -208,4 +228,5 @@ module.exports = {
   search,
   getAllFiltered,
   validate,
+  confirmUserOnEvent,
 };
