@@ -71,12 +71,12 @@ const userCanCancelParticipationOnEvent = async (request, response, next) => {
   const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const isCreator = await eventService.IsUserAdminEvent(event_id, userId);
 
-  if (isCreator === true) {
+  if (isCreator) {
     const error = new Error(constants.MESSAGE.ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR);
     return errorF(error, httpStatus.NOT_ACCEPTABLE, response);
   }
   request = await checkIfUserParticipeOnEvent(request);
-  if (request.CurrentUserHasParticipant) {
+  if (!request.CurrentUserHasParticipant) {
     const error = new Error(constants.MESSAGE.USER_NOT_REFENCY_ON_EVENT);
     return errorF(error, httpStatus.UNAUTHORIZED, response);
   }
