@@ -100,7 +100,7 @@ const getDetailsEvent = async (request, response) => {
   let filter;
   if (request.CurrentUserIsAdmin) {
     eventObject.CurrentUserIsAdmin = true;
-    filter = 'username telephone -_id';
+    filter = 'username telephone _id';
   } else {
     eventObject.CurrentUserHasParticipant = request.CurrentUserHasParticipant;
     filter = 'username -_id';
@@ -114,8 +114,8 @@ const getDetailsEvent = async (request, response) => {
   eventObject.users_valide = userParticipate.map(model => model.toObject());
   eventObject.users_waiting = userWaiting.map(model => model.toObject());
   eventObject.creator = userCreator?.toObject();
-  delete eventObject.users_refused
-  delete eventObject.users_cancel
+  delete eventObject.users_refused;
+  delete eventObject.users_cancel;
   return successF(
     'OK',
     eventObject,
@@ -204,12 +204,12 @@ const validate = async (request, response) => {
 const confirmUserOnEvent = async (request, response) => {
   const { params: { event_id, user_id } } = request;
   const event = await eventService.findOneById(event_id);
-  const user_wainting = event.users_waiting.some(user => new Types.ObjectId(user_id).equals(user.user_id))
+  const user_wainting = event.users_waiting.some(user => new Types.ObjectId(user_id).equals(user.user_id));
   if (!user_wainting) {
-    const error = new Error(MESSAGE.USER_NOT_IN_WAITING_LIST)
+    const error = new Error(MESSAGE.USER_NOT_IN_WAITING_LIST);
     return errorF(error, httpStatus.CONFLICT, response);
   }
-  await eventService.confirmParticipant(user_id, event_id)
+  await eventService.confirmParticipant(user_id, event_id);
   return successF(
     `${MESSAGE.USER_ACCEPTED_TO_EVENT} ${event.name}`,
     true,
