@@ -6,6 +6,7 @@ const {
 } = require('../middlewares/digitalocean.middleware');
 const filterF = require('../middlewares/filter.middleware');
 const filterAllowed = ['name'];
+const filterAllowedPagination = ['name', 'page', 'limit'];
 const {
   user_is_connected,
   isAdmin
@@ -23,6 +24,7 @@ const {
 const { check_params_exist, check_body_exist } = require('../middlewares/common');
 const { body_validator, params_validator } = require('../middlewares/validate');
 
+
 /**
  * GET /events
  * @summary Return all events not finish
@@ -31,9 +33,14 @@ const { body_validator, params_validator } = require('../middlewares/validate');
  * @return {array<Event>} 200 - success response - application/json
  * @example response - 200 - success response example
  */
+// router.get('/',
+//   filterF(filterAllowed),
+//   eventController.getAll
+// );
+
 router.get('/',
-  filterF(filterAllowed),
-  eventController.getAll
+  filterF(filterAllowedPagination),
+  eventController.getAllPaginate
 );
 
 /**

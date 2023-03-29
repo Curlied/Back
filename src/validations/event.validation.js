@@ -22,7 +22,9 @@ const search = {
     department: Joi.string().required(),
     code: Joi.string().allow(null),
     date: Joi.date().format('YYYY-MM-DD').utc().allow(null),
-    numdepartment: Joi.string().required()
+    numdepartment: Joi.string().required(),
+    page: Joi.number().min(0).required(),
+    limit: Joi.number().min(0).required(),
   }),
   params: Joi.object().keys({
     event_id: Joi.string().min(24).required()
