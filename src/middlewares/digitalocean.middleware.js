@@ -54,7 +54,7 @@ const push_image = (sub_folder) => (req, res, next) => {
      * (we've got the bucket, the name file and the endpoint i can create url)
      * if the method create any problems we can call get_image_profil
      **/
-    let url = spacesEndpoint.href + params.Bucket + '/' + params.Key;
+    let url = params.Key;
     arrayUrl.push(url);
   });
 
