@@ -33,6 +33,7 @@ const create = async (request, response) => {
 
 const getAll = async (_request, response) => {
   const events = await eventService.getAll() || [];
+  response.status(200).json(events);
 
   let arrayEvent = events;
   // let arrayEvent = result.docs;
@@ -52,6 +53,34 @@ const getAll = async (_request, response) => {
     delete arrayEvent[i]._doc.is_validate;
     delete arrayEvent[i]._doc.category;
     delete arrayEvent[i]._doc.creator;
+  }
+  return successF(
+    'OK',
+    events,
+    httpStatus.OK,
+    response
+  );
+};
+
+const getAllPaginate = async (request, response) => {
+  const { page, limit } = request.query;
+  const events = await eventService.getAllPaginate(page, limit) || [];
+  let arrayEvent = events;
+  for (let i = 0; i < events.docs.length; i++) {
+    const category = await categoryService.FindOneById(arrayEvent.docs[i].category);
+    arrayEvent.docs[i]._doc.categoryComplet = category;
+    arrayEvent.docs[i]._doc.nbUserActual = arrayEvent.docs[i].users_valide.length;
+
+    // remove all fileds don't need
+    delete arrayEvent.docs[i]._doc.price;
+    delete arrayEvent.docs[i]._doc.time;
+    delete arrayEvent.docs[i]._doc.users_valide;
+    delete arrayEvent.docs[i]._doc.users_waiting;
+    delete arrayEvent.docs[i]._doc.users_refused;
+    delete arrayEvent.docs[i]._doc.users_cancel;
+    delete arrayEvent.docs[i]._doc.is_validate;
+    delete arrayEvent.docs[i]._doc.category;
+    delete arrayEvent.docs[i]._doc.creator;
   }
   return successF(
     'OK',
@@ -168,13 +197,21 @@ const cancelEvent = async (request, response) => {
 
 const search = async (request, response) => {
   const arrayEvent = await eventService.searchEvents(request);
-
-  for (let i = 0; i < arrayEvent.length; i++) {
-    const category = await categoryService.FindOneById(arrayEvent[i].category);
-    arrayEvent[i]._doc.categoryComplet = category;
+  for (let i = 0; i < arrayEvent.docs.length; i++) {
+    const category = await categoryService.FindOneById(arrayEvent.docs[i].category);
+    arrayEvent.docs[i]._doc.categoryComplet = category;
+    arrayEvent.docs[i]._doc.nbUserActual = arrayEvent.docs[i].users_valide.length;
 
     // remove all fileds don't need
-    delete arrayEvent[i]._doc.category;
+    delete arrayEvent.docs[i]._doc.price;
+    delete arrayEvent.docs[i]._doc.time;
+    delete arrayEvent.docs[i]._doc.users_valide;
+    delete arrayEvent.docs[i]._doc.users_waiting;
+    delete arrayEvent.docs[i]._doc.users_refused;
+    delete arrayEvent.docs[i]._doc.users_cancel;
+    delete arrayEvent.docs[i]._doc.is_validate;
+    delete arrayEvent.docs[i]._doc.category;
+    delete arrayEvent.docs[i]._doc.creator;
   }
 
   if (arrayEvent.length == 0) {
@@ -229,4 +266,5 @@ module.exports = {
   getAllFiltered,
   validate,
   confirmUserOnEvent,
+  getAllPaginate,
 };
