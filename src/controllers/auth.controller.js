@@ -54,8 +54,8 @@ const login = async (request, response) => {
 };
 
 const email_confirmation = async (request, response) => {
-  const { query } = request;
-  const { key } = query;
+  const { params } = request;
+  const { key } = params;
   const MagicKey = key || '';
   const email = Cache.get(MagicKey);
   if (!email) {
