@@ -86,7 +86,7 @@ router.post('/login',
  *  }
  */
 router.put('/confirm',
-  check_query_exist, authController.email_confirmation
+  authController.email_confirmation
 );
 
 router.get('/disconnect',
