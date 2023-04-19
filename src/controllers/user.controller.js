@@ -256,7 +256,7 @@ const updateUserPassword = async (request, response) => {
     userChanged.username,
     urlTemp
   );
-  emailService.sendHtmlEmail(
+  await emailService.sendHtmlEmail(
     userChanged.email,
     'Confirmation changement du password',
     emailHtml

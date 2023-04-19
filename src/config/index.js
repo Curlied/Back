@@ -16,6 +16,7 @@ module.exports = {
     from: process.env.EMAIL_FROM,
     username: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
+    key: process.env.SENDGRID_KEY,
   },
   version: process.env.VERSION,
   environment: process.env.NODE_ENV,

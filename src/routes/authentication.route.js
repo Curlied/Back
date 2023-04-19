@@ -86,7 +86,6 @@ router.post('/login',
  *  }
  */
 router.put('/confirm',
-  check_query_exist, query_validator(authValidation.register),
   authController.email_confirmation
 );
 
