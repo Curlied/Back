@@ -4,6 +4,10 @@
     {
       "src": "src/index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public/templates/**",
+      "use": "@now/static"
     }
   ],
   "routes": [
