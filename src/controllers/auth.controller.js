@@ -58,6 +58,8 @@ const email_confirmation = async (request, response) => {
   const { key } = params;
   const MagicKey = key || '';
   const email = Cache.get(MagicKey);
+  console.log('MagicKey', key);
+  console.log('email', email);
   if (!email) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_MAIL_NOT_POSSIBLE);
     return errorF(error, httpStatus.BAD_REQUEST, response);
