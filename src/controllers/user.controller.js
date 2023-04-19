@@ -203,7 +203,7 @@ const updateUserEmail = async (request, response) => {
   const { body } = request;
   // on reinitialise la validation
   body.is_validate = false;
-
+  
   const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const userChanged = await userService.findOneAndUpdateInformations(userId, body);
   if (!userChanged) {
@@ -211,7 +211,6 @@ const updateUserEmail = async (request, response) => {
     return errorF(error, httpStatus.CONFLICT, response);
   }
   const urlTemp = emailService.GetTempURl(body.email);
-  console.log(process.cwd());
   let emailHtml = fs
     .readFileSync(constants.EMAIL_TEMPLATE.PATH_CONFIRMATION_INSCRIPTION)
     .toString();
