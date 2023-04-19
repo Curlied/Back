@@ -42,12 +42,14 @@ const sendHtmlEmail = async (to, subject, html) => {
     subject,
     html,
   };
-  await transport.sendMail(msg, (error, info) => {
-    if (error) {
-      throw error;
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
+  await new Promise(() => {
+    transport.sendMail(msg, (error, info) => {
+      if (error) {
+        throw error;
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
   });
 };
 
