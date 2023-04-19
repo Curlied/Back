@@ -60,7 +60,7 @@ const eventModel = new mongoose.Schema({
   }],
   is_validate: {
     type: types.Boolean,
-    default: false
+    default: true
   },
   created_at: {
     type: types.Date,
