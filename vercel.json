@@ -3,13 +3,14 @@
   "builds": [
     {
       "src": "src/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "public": "src/templates"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/templates/(.*)",
+      "dest": "src/templates/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "src/index.js",
