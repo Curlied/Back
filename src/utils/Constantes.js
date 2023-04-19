@@ -24,7 +24,7 @@ module.exports = Object.freeze({
     CONFIRMATION_MAIL_SUCCESS: 'Votre compte a été créée et validé avec succès',
     CONFIRMATION_MAIL_NOT_POSSIBLE: 'Il n\'y a pas d\'adresse mail à confirmer',
     CONFIRMATION_MAIL_ERROR: 'L\'actualisation de l\'adresse n\'a pas pû être réalisé',
-    CONFIRMATION_EVENT_ADD: 'L\'évènement à bien été enregistrer et est en attente de validation',
+    CONFIRMATION_EVENT_ADD: 'L\'évènement à bien été enregistrer',
     CONFIRMATION_NOT_MADE: 'Vous n\'avez pas encore validé votre email',
     USER_NOT_EXIST: 'There is no account associated with this user',
     DEMAND_PARTICIPATION_IS_OK: 'Votre demande de participation à l\'évènement à bien été soumis à l\'organisateur',
