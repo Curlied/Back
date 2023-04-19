@@ -44,7 +44,7 @@ const sendHtmlEmail = async (to, subject, html) => {
   };
   await transport.sendMail(msg, (error, info) => {
     if (error) {
-      console.log('error', error);
+      throw error;
     } else {
       console.log('Email sent: ' + info.response);
     }
