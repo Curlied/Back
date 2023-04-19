@@ -211,6 +211,7 @@ const updateUserEmail = async (request, response) => {
     return errorF(error, httpStatus.CONFLICT, response);
   }
   const urlTemp = emailService.GetTempURl(body.email);
+  console.log(process.cwd());
   let emailHtml = fs
     .readFileSync(constants.EMAIL_TEMPLATE.PATH_CONFIRMATION_INSCRIPTION)
     .toString();
