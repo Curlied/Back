@@ -203,7 +203,7 @@ const updateUserEmail = async (request, response) => {
   const { body } = request;
   // on reinitialise la validation
   body.is_validate = false;
-  
+
   const { token: { userId } } = await retrieve_user_from_token(getHeaderToken(request));
   const userChanged = await userService.findOneAndUpdateInformations(userId, body);
   if (!userChanged) {

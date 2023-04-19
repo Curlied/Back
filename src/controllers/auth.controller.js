@@ -13,7 +13,7 @@ const register = async (request, response) => {
     const userCreated = await userService.create(body);
     const urlTemp = emailService.GetTempURl(userCreated.email);
     let emailHtml = fs
-      .readFileSync('public/templates/confirmation-inscription.html')
+      .readFileSync(process.cwd() + '/public/templates/confirmation-inscription.html')
       .toString();
 
     emailHtml = await ReplaceUserNameAndUrl(
