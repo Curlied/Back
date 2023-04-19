@@ -53,7 +53,7 @@ module.exports = Object.freeze({
   },
   EMAIL_TEMPLATE: {
     PATH_CONFIRMATION_INSCRIPTION:
-      'public/templates/confirmation-inscription.html'
+      process.cwd() + '/public/templates/confirmation-inscription.html'
   },
   STATUS_EVENT: {
     VALIDATE: 'Validé',
