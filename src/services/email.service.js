@@ -42,7 +42,13 @@ const sendHtmlEmail = async (to, subject, html) => {
     subject,
     html,
   };
-  await transport.sendMail(msg);
+  await transport.sendMail(msg, (error, info) => {
+    if (error) {
+      console.log('error', error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 };
 
 const GetTempURl = (emailUser) => {
