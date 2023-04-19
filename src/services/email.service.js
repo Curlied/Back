@@ -2,6 +2,8 @@ const nodemailer = require('nodemailer');
 const NodeCache = require('node-cache');
 const constants = require('../utils/Constantes');
 const config = require('../config/index');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(config.email.key);
 
 const Cache = new NodeCache({
   stdTTL: config.cache.time_expire,
@@ -35,6 +37,16 @@ const sendEmail = async (to, subject, text) => {
   await transport.sendMail(msg);
 };
 
+const sendEmailPostmark = async (to, subject, text) => {
+  const msg = {
+    from: config.email.from,
+    to,
+    subject,
+    html: text,
+  };
+  await sgMail.send(msg);
+};
+
 const sendHtmlEmail = async (to, subject, html) => {
   const msg = {
     from: config.email.from,
@@ -43,13 +55,7 @@ const sendHtmlEmail = async (to, subject, html) => {
     html,
   };
   await new Promise(() => {
-    transport.sendMail(msg, (error, info) => {
-      if (error) {
-        throw error;
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    sendEmailPostmark(to, subject, html);
   });
 };
 
