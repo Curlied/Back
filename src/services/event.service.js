@@ -153,9 +153,7 @@ const IsUserParticipeOnEvent = async (request) => {
     _id: event_id,
     $or: [
       { 'users_waiting.user_id': userId },
-      { 'users_valide.user_id': userId },
-      { 'users_refused.user_id': userId },
-      { 'users_cancel.user_id': userId },
+      { 'users_valide.user_id': userId }
     ],
   });
 
