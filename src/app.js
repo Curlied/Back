@@ -110,6 +110,8 @@ app.get('/', (req, res) => {
 app.use((error, request, response, next) => {
   if (error instanceof SyntaxError) {
     errorF(error, httpStatus.INTERNAL_SERVER_ERROR, response);
+  } else if (error instanceof Error) {
+    errorF(error, httpStatus.INTERNAL_SERVER_ERROR, response);
   } else {
     next();
   }

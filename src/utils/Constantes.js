@@ -8,9 +8,9 @@ const uuid = () => {
   });
 };
 
-const convertDateStringToDate = (date_string) =>{
-  return moment(date_string, 'DD/MM/YYYY HH:mm').add(1,'hours');
-}
+const convertDateStringToDate = (date_string) => {
+  return moment(date_string, 'DD/MM/YYYY HH:mm').add(1, 'hours');
+};
 
 module.exports = Object.freeze({
   MESSAGE: {
@@ -35,9 +35,17 @@ module.exports = Object.freeze({
     DISCONNECT_OK: 'Vous avez été déconnecté !',
     CANCEL_EVENT_NOT_AUTHORIZE: 'Vous n\'avez pas le droit de supprimer cet évènement !',
     CANCEL_EVENT_OK: 'L\'évènement à correctement été annulé',
-    NO_PLACE_ON_EVENT : 'Il n\'y a plus de place pour participer à cet évènement',
-    GET_USER_EVENTS_OK : "Voici les évènements que vous avez créé et auquels vous participez",
-    ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR : "Vous ne pouvez pas participer à cet évènement car vous êtes le créateur de cet évènement",
+    NO_PLACE_ON_EVENT: 'Il n\'y a plus de place pour participer à cet évènement',
+    GET_USER_EVENTS_OK: 'Voici les évènements que vous avez créé et auquels vous participez',
+    ERROR_EVENT_PARTICIPATION_YOU_AE_CREATOR: 'Vous ne pouvez pas participer à cet évènement car vous êtes le créateur de cet évènement',
+    OBJECTID_NOT_VALID: 'L\'id de l\'utilisateur n\'est pas valide',
+    EMAIL_CONFLIT: 'L\'email est le même de votre compte actuel',
+    EMAIL_CHANGE_ERROR: 'Error dans l\'actualisation du email',
+    EMAIL_CHANGE_SUCCESSFUL: 'L\'email de l\'utilisateur a été actualisé avec succès',
+    PASSWORD_CHANGE_ERROR: 'Error dans l\'actualisation du password',
+    PASSWORD_CHANGE_SUCCESSFUL: 'Le password de l\'utilisateur a été actualisé avec succès',
+    USER_ACCEPTED_TO_EVENT: 'user accepté à l\'eventement',
+    USER_NOT_IN_WAITING_LIST: 'User n\'est pas dans la liste d\'attente de l\'event'
   },
   EMAIL_REPLACE: {
     PSEUDO: '%%pseudo%%',
@@ -45,7 +53,7 @@ module.exports = Object.freeze({
   },
   EMAIL_TEMPLATE: {
     PATH_CONFIRMATION_INSCRIPTION:
-      './src/templates/confirmation-inscription.html',
+      process.cwd() + '/public/templates/confirmation-inscription.html'
   },
   STATUS_EVENT: {
     VALIDATE: 'Validé',

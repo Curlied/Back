@@ -19,6 +19,23 @@
  */
 
 /** 
+ * @typedef {object} User-update
+ * @property {string} username
+ * @property {string} birth_date
+ * @property {string} telephone
+ */
+
+/** 
+ * @typedef {object} User-email
+ * @property {string} email
+ */
+
+/** 
+ * @typedef {object} User-password
+ * @property {string} password
+ */
+
+/** 
  * @typedef {object} Login
  * @property {string} email
  * @property {string} password

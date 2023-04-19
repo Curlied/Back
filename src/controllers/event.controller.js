@@ -7,6 +7,9 @@ const errorF = require('../utils/error');
 const httpStatus = require('http-status');
 const { retrieve_user_from_token } = require('../middlewares/user.middleware');
 const { getHeaderToken } = require('../utils/jwt');
+const { Types } = require('mongoose');
+const { MESSAGE } = require('../utils/Constantes');
+
 const create = async (request, response) => {
   try {
     const { body: event } = request;
@@ -30,6 +33,7 @@ const create = async (request, response) => {
 
 const getAll = async (_request, response) => {
   const events = await eventService.getAll() || [];
+  response.status(200).json(events);
 
   let arrayEvent = events;
   // let arrayEvent = result.docs;
@@ -49,6 +53,34 @@ const getAll = async (_request, response) => {
     delete arrayEvent[i]._doc.is_validate;
     delete arrayEvent[i]._doc.category;
     delete arrayEvent[i]._doc.creator;
+  }
+  return successF(
+    'OK',
+    events,
+    httpStatus.OK,
+    response
+  );
+};
+
+const getAllPaginate = async (request, response) => {
+  const { page, limit } = request.query;
+  const events = await eventService.getAllPaginate(page, limit) || [];
+  let arrayEvent = events;
+  for (let i = 0; i < events.docs.length; i++) {
+    const category = await categoryService.FindOneById(arrayEvent.docs[i].category);
+    arrayEvent.docs[i]._doc.categoryComplet = category;
+    arrayEvent.docs[i]._doc.nbUserActual = arrayEvent.docs[i].users_valide.length;
+
+    // remove all fileds don't need
+    delete arrayEvent.docs[i]._doc.price;
+    delete arrayEvent.docs[i]._doc.time;
+    delete arrayEvent.docs[i]._doc.users_valide;
+    delete arrayEvent.docs[i]._doc.users_waiting;
+    delete arrayEvent.docs[i]._doc.users_refused;
+    delete arrayEvent.docs[i]._doc.users_cancel;
+    delete arrayEvent.docs[i]._doc.is_validate;
+    delete arrayEvent.docs[i]._doc.category;
+    delete arrayEvent.docs[i]._doc.creator;
   }
   return successF(
     'OK',
@@ -97,7 +129,7 @@ const getDetailsEvent = async (request, response) => {
   let filter;
   if (request.CurrentUserIsAdmin) {
     eventObject.CurrentUserIsAdmin = true;
-    filter = 'username telephone -_id';
+    filter = 'username telephone _id';
   } else {
     eventObject.CurrentUserHasParticipant = request.CurrentUserHasParticipant;
     filter = 'username -_id';
@@ -111,8 +143,8 @@ const getDetailsEvent = async (request, response) => {
   eventObject.users_valide = userParticipate.map(model => model.toObject());
   eventObject.users_waiting = userWaiting.map(model => model.toObject());
   eventObject.creator = userCreator?.toObject();
-  delete eventObject.users_refused
-  delete eventObject.users_cancel
+  delete eventObject.users_refused;
+  delete eventObject.users_cancel;
   return successF(
     'OK',
     eventObject,
@@ -165,13 +197,21 @@ const cancelEvent = async (request, response) => {
 
 const search = async (request, response) => {
   const arrayEvent = await eventService.searchEvents(request);
-
-  for (let i = 0; i < arrayEvent.length; i++) {
-    const category = await categoryService.FindOneById(arrayEvent[i].category);
-    arrayEvent[i]._doc.categoryComplet = category;
+  for (let i = 0; i < arrayEvent.docs.length; i++) {
+    const category = await categoryService.FindOneById(arrayEvent.docs[i].category);
+    arrayEvent.docs[i]._doc.categoryComplet = category;
+    arrayEvent.docs[i]._doc.nbUserActual = arrayEvent.docs[i].users_valide.length;
 
     // remove all fileds don't need
-    delete arrayEvent[i]._doc.category;
+    delete arrayEvent.docs[i]._doc.price;
+    delete arrayEvent.docs[i]._doc.time;
+    delete arrayEvent.docs[i]._doc.users_valide;
+    delete arrayEvent.docs[i]._doc.users_waiting;
+    delete arrayEvent.docs[i]._doc.users_refused;
+    delete arrayEvent.docs[i]._doc.users_cancel;
+    delete arrayEvent.docs[i]._doc.is_validate;
+    delete arrayEvent.docs[i]._doc.category;
+    delete arrayEvent.docs[i]._doc.creator;
   }
 
   if (arrayEvent.length == 0) {
@@ -198,6 +238,23 @@ const validate = async (request, response) => {
   );
 };
 
+const confirmUserOnEvent = async (request, response) => {
+  const { params: { event_id, user_id } } = request;
+  const event = await eventService.findOneById(event_id);
+  const user_wainting = event.users_waiting.some(user => new Types.ObjectId(user_id).equals(user.user_id));
+  if (!user_wainting) {
+    const error = new Error(MESSAGE.USER_NOT_IN_WAITING_LIST);
+    return errorF(error, httpStatus.CONFLICT, response);
+  }
+  await eventService.confirmParticipant(user_id, event_id);
+  return successF(
+    `${MESSAGE.USER_ACCEPTED_TO_EVENT} ${event.name}`,
+    true,
+    httpStatus.OK,
+    response
+  );
+};
+
 module.exports = {
   create,
   getAll,
@@ -208,4 +265,6 @@ module.exports = {
   search,
   getAllFiltered,
   validate,
+  confirmUserOnEvent,
+  getAllPaginate,
 };

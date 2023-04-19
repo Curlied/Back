@@ -36,3 +36,12 @@
  * @property {string} users_valide.user_id
  * @property {boolean} CurrentUserIsAdmin
  */
+
+
+/** 
+ * @typedef {object} EventSearch
+ * @property {string} category
+ * @property {string} date
+ * @property {string} department
+ * @property {string} numdepartment
+ */

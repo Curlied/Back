@@ -22,7 +22,9 @@ const search = {
     department: Joi.string().required(),
     code: Joi.string().allow(null),
     date: Joi.date().format('YYYY-MM-DD').utc().allow(null),
-    numdepartment: Joi.string().required()
+    numdepartment: Joi.string().required(),
+    page: Joi.number().min(0).required(),
+    limit: Joi.number().min(0).required(),
   }),
   params: Joi.object().keys({
     event_id: Joi.string().min(24).required()
@@ -53,6 +55,13 @@ const submit_event = {
   })
 };
 
+const accept_user = {
+  params: Joi.object().keys({
+    event_id: Joi.string().min(24).required(),
+    user_id: Joi.string().min(24).required(),
+  })
+};
+
 module.exports = {
   create,
   search,
@@ -60,4 +69,5 @@ module.exports = {
   cancel_event,
   submit_event,
   delete_event,
+  accept_user,
 };

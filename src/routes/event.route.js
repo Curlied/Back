@@ -6,6 +6,7 @@ const {
 } = require('../middlewares/digitalocean.middleware');
 const filterF = require('../middlewares/filter.middleware');
 const filterAllowed = ['name'];
+const filterAllowedPagination = ['name', 'page', 'limit'];
 const {
   user_is_connected,
   isAdmin
@@ -23,6 +24,7 @@ const {
 const { check_params_exist, check_body_exist } = require('../middlewares/common');
 const { body_validator, params_validator } = require('../middlewares/validate');
 
+
 /**
  * GET /events
  * @summary Return all events not finish
@@ -31,9 +33,14 @@ const { body_validator, params_validator } = require('../middlewares/validate');
  * @return {array<Event>} 200 - success response - application/json
  * @example response - 200 - success response example
  */
+// router.get('/',
+//   filterF(filterAllowed),
+//   eventController.getAll
+// );
+
 router.get('/',
-  filterF(filterAllowed),
-  eventController.getAll
+  filterF(filterAllowedPagination),
+  eventController.getAllPaginate
 );
 
 /**
@@ -113,7 +120,7 @@ router.post('/',
 /**
  * POST /events/search
  * @summary Search event on post method with event params base on department, category, date or code 
- * @param {Event} request.body.required - event - application/json
+ * @param {EventSearch} request.body.required - event - application/json
  * @security BearerAuth
  * @tags events
  * @return {EventDetails} 200 - success response - application/json
@@ -141,6 +148,12 @@ router.put('/:event_id',
   check_params_exist, params_validator(eventValidation.retrieve),
   isAdmin,
   eventController.validate
+);
+
+router.put('/:event_id/users/:user_id/confirm',
+  user_is_connected,
+  check_params_exist, params_validator(eventValidation.accept_user),
+  eventController.confirmUserOnEvent
 );
 
 /**

@@ -8,29 +8,33 @@ const errorF = require('../utils/error');
 const successF = require('../utils/success');
 
 const register = async (request, response) => {
-  const { body } = request;
-  const userCreated = await userService.create(body);
-  const urlTemp = emailService.GetTempURl(userCreated.email);
-  let emailHtml = fs
-    .readFileSync(constants.EMAIL_TEMPLATE.PATH_CONFIRMATION_INSCRIPTION)
-    .toString();
+  try {
+    const { body } = request;
+    const userCreated = await userService.create(body);
+    const urlTemp = emailService.GetTempURl(userCreated.email);
+    let emailHtml = fs
+      .readFileSync(process.cwd() + '/public/templates/confirmation-inscription.html')
+      .toString();
 
-  emailHtml = await ReplaceUserNameAndUrl(
-    emailHtml,
-    userCreated.username,
-    urlTemp
-  );
-  emailService.sendHtmlEmail(
-    userCreated.email,
-    'Confirmation inscription',
-    emailHtml
-  );
-  return successF(
-    constants.MESSAGE.REGISTER_SUCCES,
-    userCreated,
-    httpStatus.OK,
-    response
-  );
+    emailHtml = await ReplaceUserNameAndUrl(
+      emailHtml,
+      userCreated.username,
+      urlTemp
+    );
+    emailService.sendHtmlEmail(
+      userCreated.email,
+      'Confirmation inscription',
+      emailHtml
+    );
+    return successF(
+      constants.MESSAGE.REGISTER_SUCCES,
+      userCreated,
+      httpStatus.OK,
+      response
+    );
+  } catch (error) {
+    return errorF(error, httpStatus.BAD_REQUEST, response);
+  }
 };
 
 const login = async (request, response) => {
@@ -56,11 +60,7 @@ const email_confirmation = async (request, response) => {
   const email = Cache.get(MagicKey);
   if (!email) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_MAIL_NOT_POSSIBLE);
-    return errorF(
-      error,
-      httpStatus.BAD_REQUEST,
-      response
-    );
+    return errorF(error, httpStatus.BAD_REQUEST, response);
   }
 
   const user = await userService.findOneAndConfirm(email);
@@ -79,7 +79,6 @@ const email_confirmation = async (request, response) => {
 };
 
 const disconnect = async (request, response) => {
-
   return successF(
     constants.MESSAGE.DISCONNECT_OK,
     '',
@@ -92,5 +91,5 @@ module.exports = {
   register,
   login,
   email_confirmation,
-  disconnect
+  disconnect,
 };

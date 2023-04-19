@@ -42,7 +42,13 @@ const sendHtmlEmail = async (to, subject, html) => {
     subject,
     html,
   };
-  await transport.sendMail(msg);
+  await transport.sendMail(msg, (error, info) => {
+    if (error) {
+      console.log('error', error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 };
 
 const GetTempURl = (emailUser) => {
@@ -61,7 +67,6 @@ const GetTempURl = (emailUser) => {
   }
 
   Cache.set(CacheKey, emailUser);
-  console.log(config.url_front + '/confirm?key=' + CacheKey);
   return config.url_front + '/confirm?key=' + CacheKey;
 };
 

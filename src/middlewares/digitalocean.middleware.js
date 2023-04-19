@@ -12,23 +12,6 @@ const s3_config = new aws.S3({
 });
 
 /**
- * WARNING not use actually remove this method if manual url is right on production
- * Fetch url of user image and add it on req.body
- * @param {*} req request
- * @param {*} namefile file name with unique identifier
- */
-// eslint-disable-next-line no-unused-vars
-const get_image_profil = async (req, namefile) => {
-  let params = {
-    Bucket: 'curlied/curliedImages/users_pictures',
-    Key: namefile,
-  };
-  let url = s3_config.getSignedUrl('getObject', params);
-  req.body.profile_image = url;
-};
-
-
-/**
  * Generic method or push image
  * @param {*} req
  * @param {*} res
@@ -36,7 +19,6 @@ const get_image_profil = async (req, namefile) => {
  * @returns
  */
 const push_image = (sub_folder) => (req, res, next) => {
-
   if (!req || !req.files) {
     return next();
   }
@@ -72,7 +54,7 @@ const push_image = (sub_folder) => (req, res, next) => {
      * (we've got the bucket, the name file and the endpoint i can create url)
      * if the method create any problems we can call get_image_profil
      **/
-    let url = spacesEndpoint.href + params.Bucket + '/' + params.Key;
+    let url = params.Key;
     arrayUrl.push(url);
   });
 
