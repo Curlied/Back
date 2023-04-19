@@ -7,7 +7,8 @@
     },
     {
       "src": "public/templates/**",
-      "use": "@now/static"
+      "use": "@now/static",
+      "config": { "public": true }
     }
   ],
   "routes": [
