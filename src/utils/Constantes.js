@@ -10,7 +10,7 @@ const uuid = () => {
 
 const convertDateStringToDate = (date_string) => {
   return moment(date_string, 'DD/MM/YYYY HH:mm').add(1, 'hours');
-}
+};
 
 module.exports = Object.freeze({
   MESSAGE: {
