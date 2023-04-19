@@ -1,14 +1,10 @@
 {
   "version": 2,
   "builds": [
+    { "handle": "static", "src": "public/**", "use": "@now/static", "config": { "zeroConfig": true } },
     {
       "src": "src/index.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "public/templates/**",
-      "use": "@now/static",
-      "config": { "public": true }
     }
   ],
   "routes": [
