@@ -24,6 +24,11 @@ module.exports = {
     secret: process.env.TOKEN_SECRET,
     expire: process.env.TOKEN_EXPIRE,
   },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD,
+  },
   url_front: process.env.URL_FRONT,
   cache: {
     time_expire: 60,

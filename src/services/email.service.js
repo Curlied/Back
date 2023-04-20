@@ -1,23 +1,42 @@
 const nodemailer = require('nodemailer');
-const NodeCache = require('node-cache');
 const constants = require('../utils/Constantes');
 const config = require('../config/index');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(config.email.key);
-
-const Cache = new NodeCache({
-  stdTTL: config.cache.time_expire,
-  checkperiod: config.cache.time_update,
+const redis = require('redis');
+const client = redis.createClient({
+  password: config.redis.password,
+  socket: {
+    host: config.redis.host,
+    port: config.redis.port,
+  },
 });
+
+
+const insertConfirmPasswordKey = async (key, email) => {
+  await client.connect();
+  const keyRedis = `curlied:confirm_password:${key}`;
+  await client.set(keyRedis, email, 'EX', 1800);
+  await client.quit();
+};
+
+const getConfirmPasswordKey = async (keyToConfirm) => {
+  await client.connect();
+  const keyRedis = `curlied:confirm_password:${keyToConfirm}`;
+  const email = await client.get(keyRedis);
+  await client.quit();
+  return email;
+};
+
+const deleteKey = async (key) => {
+  await client.connect();
+  const keyRedis = `curlied:confirm_password:${key}`;
+  await client.del(keyRedis);
+  await client.quit();
+};
 
 const generateRandomString = () => {
   const randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  return randomString;
-};
-
-const setRandomString = (email) => {
-  const randomString = generateRandomString();
-  Cache.set(randomString, email);
   return randomString;
 };
 
@@ -64,8 +83,9 @@ const sendHtmlEmail = async (to, subject, html) => {
   });
 };
 
-const GetTempURl = (emailUser) => {
-  const CacheKey = setRandomString(emailUser);
+const GetTempURl = async (emailUser) => {
+  const CacheKey = generateRandomString();
+  await insertConfirmPasswordKey(CacheKey, emailUser);
   return config.url_front + '/confirm?key=' + CacheKey;
 };
 
@@ -84,6 +104,7 @@ module.exports = {
   sendEmail,
   sendHtmlEmail,
   GetTempURl,
-  Cache,
   ReplaceUserNameAndUrl,
+  getConfirmPasswordKey,
+  deleteKey,
 };

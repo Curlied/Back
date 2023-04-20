@@ -2,7 +2,7 @@ const userService = require('../services/user.service');
 const emailService = require('../services/email.service');
 const constants = require('../utils/Constantes');
 const fs = require('fs');
-const { Cache, ReplaceUserNameAndUrl } = require('../services/email.service');
+const { ReplaceUserNameAndUrl, getConfirmPasswordKey, deleteKey } = require('../services/email.service');
 const httpStatus = require('http-status');
 const errorF = require('../utils/error');
 const successF = require('../utils/success');
@@ -11,7 +11,7 @@ const register = async (request, response) => {
   try {
     const { body } = request;
     const userCreated = await userService.create(body);
-    const urlTemp = emailService.GetTempURl(userCreated.email);
+    const urlTemp = await emailService.GetTempURl(userCreated.email);
     let emailHtml = fs
       .readFileSync(process.cwd() + '/public/templates/confirmation-inscription.html')
       .toString();
@@ -57,7 +57,7 @@ const email_confirmation = async (request, response) => {
   const { query } = request;
   const { key } = query;
   const MagicKey = key || '';
-  const email = Cache.get(MagicKey);
+  const email = await getConfirmPasswordKey(MagicKey);
   if (!email) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_MAIL_NOT_POSSIBLE);
     return errorF(error, httpStatus.BAD_REQUEST, response);
@@ -69,7 +69,7 @@ const email_confirmation = async (request, response) => {
     return errorF(error, httpStatus.NON_AUTHORITATIVE_INFORMATION, response);
   }
 
-  Cache.del(MagicKey);
+  await deleteKey(MagicKey);
   return successF(
     constants.MESSAGE.CONFIRMATION_MAIL_SUCCESS,
     '',
