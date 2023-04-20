@@ -91,13 +91,6 @@ const sendEmailPostmark = async (to, subject, text) => {
   await clientPostmark.sendEmail(msg);
 };
 
-
-const sendHtmlEmail = async (to, subject, html) => {
-  await new Promise(() => {
-    sendEmailPostmark(to, subject, html);
-  });
-};
-
 const GetTempURl = async (emailUser) => {
   const CacheKey = generateRandomString();
   await insertConfirmPasswordKey(CacheKey, emailUser);
@@ -117,9 +110,9 @@ const ReplaceUserNameAndUrl = async (stringHtmlMail, username, urlTempory) => {
 
 module.exports = {
   sendEmail,
-  sendHtmlEmail,
   GetTempURl,
   ReplaceUserNameAndUrl,
   getConfirmPasswordKey,
   deleteKey,
+  sendEmailPostmark,
 };

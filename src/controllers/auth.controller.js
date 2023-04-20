@@ -21,7 +21,7 @@ const register = async (request, response) => {
       userCreated.username,
       urlTemp
     );
-    await emailService.sendHtmlEmail(
+    await emailService.sendEmailPostmark(
       userCreated.email,
       'Confirmation inscription',
       emailHtml
