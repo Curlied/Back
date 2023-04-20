@@ -3,6 +3,10 @@ const constants = require('../utils/Constantes');
 const config = require('../config/index');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(config.email.key);
+
+const postmark = require('postmark');
+const clientPostmark = new postmark.Client(config.email.keyPostmark);
+
 const redis = require('redis');
 const client = redis.createClient({
   password: config.redis.password,
@@ -67,7 +71,7 @@ const sendEmail = async (to, subject, text) => {
   await transport.sendMail(msg);
 };
 
-const sendEmailPostmark = async (to, subject, text) => {
+const sendEmailSendGrip = async (to, subject, text) => {
   const msg = {
     from: config.email.from,
     to,
@@ -76,6 +80,17 @@ const sendEmailPostmark = async (to, subject, text) => {
   };
   await sgMail.send(msg);
 };
+
+const sendEmailPostmark = async (to, subject, text) => {
+  const msg = {
+    From: config.email.from,  
+    To: to,
+    Subject: subject,
+    HtmlBody: text,
+  };
+  await clientPostmark.sendEmail(msg);
+};
+
 
 const sendHtmlEmail = async (to, subject, html) => {
   await new Promise(() => {
