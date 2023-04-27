@@ -129,12 +129,12 @@ const getDetailsEvent = async (request, response) => {
     filter = 'username telephone _id';
   } else {
     eventObject.CurrentUserHasParticipant = request.CurrentUserHasParticipant;
-    filter = 'username -_id';
+    filter = 'username _id';
   }
 
   const userParticipate = await userService.findManyById(usersIdArrayValidate, filter);
   const userWaiting = await userService.findManyById(usersIdArrayWaiting, filter);
-  const userCreator = await userService.findOne(event.creator, 'username -_id');
+  const userCreator = await userService.findOne(event.creator, 'username');
 
   eventObject.category = category?.toObject();
   eventObject.users_valide = userParticipate.map(model => model.toObject());
