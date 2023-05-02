@@ -72,8 +72,8 @@ const email_confirmation = async (request, response) => {
   await deleteKey(MagicKey);
   return successF(
     constants.MESSAGE.CONFIRMATION_MAIL_SUCCESS,
-    '',
-    httpStatus.NO_CONTENT,
+    'Votre compte a bien été validé',
+    httpStatus.OK,
     response
   );
 };
