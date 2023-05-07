@@ -21,7 +21,7 @@ const eventModel = new mongoose.Schema({
   },
   date_time: {
     type: types.Date,
-    required: true
+    required: true,
   },
   user_max: {
     type: types.Number,
