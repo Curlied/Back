@@ -56,7 +56,8 @@ const login = async (email, password) => {
   const bearerToken = await jwt.sign({
     email: user.email,
     roles: user.roles,
-    userId: user._id
+    userId: user._id,
+    username: user.username
   }, config.token.secret, { expiresIn: config.token.expire });
 
   const test = await compareAsync(password, user.password);

@@ -17,12 +17,18 @@ module.exports = {
     username: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
     key: process.env.SENDGRID_KEY,
+    keyPostmark: process.env.POSTMARK_KEY,
   },
   version: process.env.VERSION,
   environment: process.env.NODE_ENV,
   token: {
     secret: process.env.TOKEN_SECRET,
     expire: process.env.TOKEN_EXPIRE,
+  },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD,
   },
   url_front: process.env.URL_FRONT,
   cache: {

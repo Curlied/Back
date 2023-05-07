@@ -2,7 +2,7 @@ const userService = require('../services/user.service');
 const emailService = require('../services/email.service');
 const constants = require('../utils/Constantes');
 const fs = require('fs');
-const { Cache, ReplaceUserNameAndUrl } = require('../services/email.service');
+const { ReplaceUserNameAndUrl, getConfirmPasswordKey, deleteKey } = require('../services/email.service');
 const httpStatus = require('http-status');
 const errorF = require('../utils/error');
 const successF = require('../utils/success');
@@ -11,7 +11,7 @@ const register = async (request, response) => {
   try {
     const { body } = request;
     const userCreated = await userService.create(body);
-    const urlTemp = emailService.GetTempURl(userCreated.email);
+    const urlTemp = await emailService.GetTempURl(userCreated.email);
     let emailHtml = fs
       .readFileSync(process.cwd() + '/public/templates/confirmation-inscription.html')
       .toString();
@@ -21,7 +21,7 @@ const register = async (request, response) => {
       userCreated.username,
       urlTemp
     );
-    emailService.sendHtmlEmail(
+    await emailService.sendEmailPostmark(
       userCreated.email,
       'Confirmation inscription',
       emailHtml
@@ -42,11 +42,11 @@ const login = async (request, response) => {
   const { email, password } = body;
   const { token, username } = await userService.login(email, password);
   if (!token) {
-    const error = new Error('Invalid Credentials');
+    const error = new Error('Compte non trouvé');
     return errorF(error, httpStatus.BAD_REQUEST, response);
   }
   return successF(
-    'The connection has been done',
+    'La connexion a réussi',
     { username, token },
     httpStatus.OK,
     response
@@ -57,7 +57,7 @@ const email_confirmation = async (request, response) => {
   const { query } = request;
   const { key } = query;
   const MagicKey = key || '';
-  const email = Cache.get(MagicKey);
+  const email = await getConfirmPasswordKey(MagicKey);
   if (!email) {
     const error = new Error(constants.MESSAGE.CONFIRMATION_MAIL_NOT_POSSIBLE);
     return errorF(error, httpStatus.BAD_REQUEST, response);
@@ -69,11 +69,11 @@ const email_confirmation = async (request, response) => {
     return errorF(error, httpStatus.NON_AUTHORITATIVE_INFORMATION, response);
   }
 
-  Cache.del(MagicKey);
+  await deleteKey(MagicKey);
   return successF(
     constants.MESSAGE.CONFIRMATION_MAIL_SUCCESS,
-    '',
-    httpStatus.NO_CONTENT,
+    'Votre compte a bien été validé',
+    httpStatus.OK,
     response
   );
 };

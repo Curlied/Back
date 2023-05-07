@@ -44,7 +44,6 @@ const getAll = async (_request, response) => {
     arrayEvent[i]._doc.nbUserActual = arrayEvent[i].users_valide.length;
 
     // remove all fileds don't need
-    delete arrayEvent[i]._doc.price;
     delete arrayEvent[i]._doc.time;
     delete arrayEvent[i]._doc.users_valide;
     delete arrayEvent[i]._doc.users_waiting;
@@ -72,7 +71,6 @@ const getAllPaginate = async (request, response) => {
     arrayEvent.docs[i]._doc.nbUserActual = arrayEvent.docs[i].users_valide.length;
 
     // remove all fileds don't need
-    delete arrayEvent.docs[i]._doc.price;
     delete arrayEvent.docs[i]._doc.time;
     delete arrayEvent.docs[i]._doc.users_valide;
     delete arrayEvent.docs[i]._doc.users_waiting;
@@ -99,7 +97,6 @@ const getAllFiltered = async (request, response) => {
     events[i]._doc.nbUserActual = events[i].users_valide.length;
 
     // remove all fileds don't need
-    delete events[i]._doc.price;
     delete events[i]._doc.time;
     delete events[i]._doc.users_valide;
     delete events[i]._doc.users_waiting;
@@ -132,12 +129,12 @@ const getDetailsEvent = async (request, response) => {
     filter = 'username telephone _id';
   } else {
     eventObject.CurrentUserHasParticipant = request.CurrentUserHasParticipant;
-    filter = 'username -_id';
+    filter = 'username _id';
   }
 
   const userParticipate = await userService.findManyById(usersIdArrayValidate, filter);
   const userWaiting = await userService.findManyById(usersIdArrayWaiting, filter);
-  const userCreator = await userService.findOne(event.creator, 'username -_id');
+  const userCreator = await userService.findOne(event.creator, 'username');
 
   eventObject.category = category?.toObject();
   eventObject.users_valide = userParticipate.map(model => model.toObject());
@@ -203,7 +200,6 @@ const search = async (request, response) => {
     arrayEvent.docs[i]._doc.nbUserActual = arrayEvent.docs[i].users_valide.length;
 
     // remove all fileds don't need
-    delete arrayEvent.docs[i]._doc.price;
     delete arrayEvent.docs[i]._doc.time;
     delete arrayEvent.docs[i]._doc.users_valide;
     delete arrayEvent.docs[i]._doc.users_waiting;
