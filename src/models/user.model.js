@@ -16,7 +16,8 @@ const userSchema = mongoose.Schema({
   },
   telephone: {
     type: types.String,
-    required: true,
+    required: false,
+    default: null,
   },
   url_image: {
     type: types.String,

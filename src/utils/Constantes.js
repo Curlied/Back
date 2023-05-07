@@ -9,7 +9,7 @@ const uuid = () => {
 };
 
 const convertDateStringToDate = (date_string) => {
-  return moment(date_string, 'DD/MM/YYYY HH:mm').add(1, 'hours');
+  return moment(date_string, 'DD/MM/YYYY HH:mm');
 };
 
 module.exports = Object.freeze({
