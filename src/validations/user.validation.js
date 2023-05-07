@@ -17,7 +17,7 @@ const userUpdate = {
       'date.base': `Veuillez utilisez un date valid`,
       'any.required': `La date de naissance est un champ obligatoire`
     }),
-    telephone: Joi.string().regex(/(^[0-9]+$)/).messages({
+    telephone: Joi.string().regex(/(^[0-9]+$)/).allow('').messages({
       'string.empty': `Le téléphone ne peut pas être vide`,
       'string.required': `Le téléphone est un champ obligatoire`,
       'string.pattern.base': `Veuillez utilisez un téléphone valid`
