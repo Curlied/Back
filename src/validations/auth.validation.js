@@ -30,7 +30,7 @@ const register = {
     confirm_password: Joi.string().valid(Joi.ref('password')).required().messages({
       'any.only': 'Le mot de passe de confirmation ne corresponds pas au mot de passe'
     }),
-    telephone: Joi.string().regex(/(^[0-9]+$)/).required().messages({
+    telephone: Joi.string().regex(/(^[0-9]+$)/).messages({
       'string.empty': `Le téléphone ne peut pas être vide`,
       'string.required': `Le téléphone est un champ obligatoire`,
       'string.pattern.base': `Veuillez utilisez un téléphone valid`
