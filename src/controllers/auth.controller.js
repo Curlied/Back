@@ -42,7 +42,7 @@ const login = async (request, response) => {
   const { email, password } = body;
   const { token, username } = await userService.login(email, password);
   if (!token) {
-    const error = new Error('Invalid Credentials');
+    const error = new Error('Compte non trouvé');
     return errorF(error, httpStatus.BAD_REQUEST, response);
   }
   return successF(
