@@ -46,7 +46,7 @@ const login = async (request, response) => {
     return errorF(error, httpStatus.BAD_REQUEST, response);
   }
   return successF(
-    'The connection has been done',
+    'La connexion a réussi',
     { username, token },
     httpStatus.OK,
     response
