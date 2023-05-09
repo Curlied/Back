@@ -16,10 +16,18 @@ jobs:
         with:
           args: '> 💬 Starting CI workflow for `${{ github.repository }}` on ${{ github.ref_type }}: `${{ github.ref_name }}`. See progress at https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}.'
       - name: SonarCloud Scan
+        id: sonarcloud
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Wait for SonarCloud analysis to complete
+        if: ${{ job.status == 'in_progress' }}
+        run: |
+          while [ "$(curl -s -u '${{ secrets.SONAR_TOKEN }}:' 'https://sonarcloud.io/api/ce/activity?component=curlied-back&branch=${{ github.ref_name }}&status=PENDING' | jq '.tasks | length')" -gt "0" ]; do
+            echo "SonarCloud analysis is still in progress. Waiting for 30 seconds..."
+            sleep 30
+          done
       - name: Discord notification sonarcloud end
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
